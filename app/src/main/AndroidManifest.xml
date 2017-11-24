@@ -23,10 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".NowPlayingActivity"
             android:label="Now Playing"
-            android:parentActivityName=".AllsongsActivity">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -59,6 +60,7 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".SettingActivity"
             android:label="Settings"
@@ -67,6 +69,7 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".EqualizerActivity"
             android:label="Equalizer"
@@ -75,65 +78,38 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".AllsongsActivity"
-            android:label="All Songs"
-            android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".Albums"
-            android:label="Albums"
-            android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+
+
+
         <activity
             android:name=".AlbumsSongs"
-            android:label="AlbumSongs"
-            android:launchMode="singleTop"
-            android:parentActivityName=".Albums">
+            android:label="Album Songs"
+            android:launchMode="singleTop">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Genres"
-            android:label="Genres"
-            android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+
+
+
         <activity
             android:name=".GenreSongs"
             android:label="Genre Songs"
             android:launchMode="singleTop"
-            android:parentActivityName=".Genres">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Artists"
-            android:label="Artists"
-            android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+
+
+
         <activity
             android:name=".ArtistSongs"
             android:label="Artist Songs"
             android:launchMode="singleTop"
-            android:parentActivityName=".Artists">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -165,6 +141,8 @@
 
 
         </service>
+
+
     </application>
 
 </manifest>

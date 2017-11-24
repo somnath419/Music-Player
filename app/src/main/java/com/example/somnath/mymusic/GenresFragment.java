@@ -1,54 +1,47 @@
 package com.example.somnath.mymusic;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.Toast;
-import java.io.File;
-import java.io.IOException;
+
+import com.example.somnath.mymusic.adapters.GenresAdapter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
-import static java.lang.System.err;
 
-
-public class Genres extends AppCompatActivity{
+public class GenresFragment extends Fragment{
 
 
     private ArrayList<Song> songList;
-    private GridView list;
+    private ListView list;
 
-    protected void onCreate( Bundle savedInstanceState)
-    {         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_albums);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.listviewlist, container, false);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
 // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
 // app-defined int constant
-                return;
+                return v;
             }}
 
-
-        list=(GridView) findViewById(R.id.grid_view);
+        list=(ListView)v.findViewById(R.id.grid_view);
         songList = new ArrayList<Song>();
 
 
@@ -61,12 +54,14 @@ public class Genres extends AppCompatActivity{
 
             }});
 
-        GenresAdapter songAdt = new GenresAdapter(this, songList);
+        GenresAdapter songAdt = new GenresAdapter(getActivity(), songList);
         list.setAdapter(songAdt);
 
 
-
+        return v;
     }
+
+
 
     public void getGenreList() {
          Cursor mediaCursor;
@@ -83,7 +78,7 @@ public class Genres extends AppCompatActivity{
                 MediaStore.Audio.Genres._ID
         };
 
-            mediaCursor =getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            mediaCursor =getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     mediaProjection, null, null, null);
 
             int artist_column_index = mediaCursor
@@ -104,7 +99,7 @@ public class Genres extends AppCompatActivity{
                     int musicId = Integer.parseInt(mediaCursor.getString(id_column_index));
 
                     Uri uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", musicId);
-                    genresCursor = getContentResolver().query(uri,
+                    genresCursor = getActivity(). getContentResolver().query(uri,
                             genresProjection, null, null, null);
                     int genre_column_index = genresCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
 

@@ -5,99 +5,96 @@ import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
+import com.example.somnath.mymusic.adapters.TabPagerAdapter;
+
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,TabLayout.OnTabSelectedListener {
+
+    //This is our tablayout
+    private TabLayout tabLayout;
+    private  Menu menu;
+
+    //This is our viewPager
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
-        GridView mylist = (GridView) findViewById(R.id.grid_view1);
-
-        String[] library = new String[]{"Tracks", "Albums", "Artists", "Genres", "Playlists", "Folders"};
-
-        ArrayAdapter<String> myadapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, library);
-
-        mylist.setAdapter(myadapter);
-
-
-
-
-        mylist.setOnItemClickListener(  new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-
-            {
-
-                if (position == 0) {
-                    Intent myIntent = new Intent(getApplicationContext(), AllsongsActivity.class);
-                    startActivity(myIntent);
-                }
-
-                if (position == 1) {
-                    Intent myIntent = new Intent(getApplicationContext(), Albums.class);
-                    startActivity(myIntent);
-                }
-
-                if (position == 2) {
-                    Intent myIntent = new Intent(view.getContext(), Artists.class);
-                    startActivityForResult(myIntent, 0);
-                }
-
-                if (position == 3) {
-                    Intent myIntent = new Intent(getApplicationContext(), Genres.class);
-                    startActivity(myIntent);
-                }
-
-                if (position == 4) {
-                    Intent myIntent = new Intent(view.getContext(), ScanActivity.class);
-                    startActivityForResult(myIntent, 0);
-                }
-
-                if (position == 5) {
-                    Intent myIntent = new Intent(view.getContext(), ScanActivity.class);
-                    startActivityForResult(myIntent, 0);
-                }
-
-
-            }
-        });
-
-
+        //Adding toolbar to the activity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        //drawerlayout started
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
-
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        //Initializing the tablayout
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
+        //Adding the tabs using addTab() method
+        tabLayout.addTab(tabLayout.newTab().setText("Songs"));
+        tabLayout.addTab(tabLayout.newTab().setText("Albums"));
+        tabLayout.addTab(tabLayout.newTab().setText("Artists"));
+        tabLayout.addTab(tabLayout.newTab().setText("Genres"));
+        tabLayout.addTab(tabLayout.newTab().setText("Playlists"));
 
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        //Initializing viewPager
+        viewPager = (ViewPager) findViewById(R.id.pager);
+
+        //Creating our pager adapter
+        TabPagerAdapter adapter = new TabPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+
+        //Adding adapter to pager
+        viewPager.setAdapter(adapter);
+
+        //Adding onTabSelectedListener to swipe views
+        tabLayout.setOnTabSelectedListener(this);
+    }
+
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        viewPager.setCurrentItem(tab.getPosition());
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
 
     }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+
+    }
+
+
+
+
+
 
     @Override
     public void onResume() {
@@ -119,6 +116,11 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+
+
+
+
+
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -170,9 +172,5 @@ public class MainActivity extends AppCompatActivity
 
 
     }
-
-
-
-
 
 }

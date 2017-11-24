@@ -2,65 +2,54 @@ package com.example.somnath.mymusic;
 
 import android.Manifest;
 
-import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import org.w3c.dom.Text;
+import com.example.somnath.mymusic.adapters.AlbumAdapter;
+import com.example.somnath.mymusic.adapters.SongAdapter;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static java.lang.System.err;
 
-
-public class AllsongsActivity extends AppCompatActivity {
+public class AllSongsFragment extends Fragment {
 
 
     private ArrayList<Song> songList;
     private ListView list;
 
 
-
-
-    protected void onCreate( Bundle savedInstanceState)
-    {         super.onCreate(savedInstanceState);
-            setContentView(R.layout.player);
-
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.listviewlist, container, false);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
-// MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-// app-defined int constant
-                return;
+                // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
+                // app-defined int constant
+                return v;
             }}
 
 
-         list=(ListView) findViewById(R.id.list_item);
-         songList = new ArrayList<Song>();
+        list=(ListView)v. findViewById(R.id.grid_view);
+        songList = new ArrayList<Song>();
 
 
 
@@ -68,21 +57,25 @@ public class AllsongsActivity extends AppCompatActivity {
 
 
         Collections.sort(songList, new Comparator<Song>(){
-       public int compare(Song a, Song b){
-    return a.getTitle().compareTo(b.getTitle());
-               }
+            public int compare(Song a, Song b){
+                return a.getTitle().compareTo(b.getTitle());
+            }
         });
 
-        SongAdapter songAdt = new SongAdapter(this,songList);
+        SongAdapter songAdt = new SongAdapter(getContext(),songList);
         list.setAdapter(songAdt);
 
 
-
-
+        return v;
     }
 
+
+
+
+
+
     public void getSongList() {
-          ContentResolver musicResolver = getContentResolver();
+          ContentResolver musicResolver = getActivity().getContentResolver();
            Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
           Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
