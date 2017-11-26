@@ -74,6 +74,10 @@ public class MainActivity extends AppCompatActivity
 
         //Adding onTabSelectedListener to swipe views
         tabLayout.setOnTabSelectedListener(this);
+
+
+
+
     }
 
     @Override
@@ -134,23 +138,24 @@ public class MainActivity extends AppCompatActivity
 
             Intent i = new Intent(this, NowPlayingActivity.class);
             startActivity(i);
+            return true;
 
 
         } else if (id == R.id.nav_scanmedia) {
 
             Intent i = new Intent(this, ScanActivity.class);
             startActivity(i);
+            return  true;
 
         } else if (id == R.id.nav_manage) {
-
-
             Intent i = new Intent(this, SettingActivity.class);
             startActivity(i);
-
+            return  true;
 
         } else if (id == R.id.equalizer) {
             Intent i = new Intent(this, EqualizerActivity.class);
             startActivity(i);
+            return true;
 
 
         } else if (id == R.id.nav_share) {
@@ -162,6 +167,7 @@ public class MainActivity extends AppCompatActivity
                     " \n http://www.somgemyadav.tk");
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.sendto)));
+            return true;
 
 
         }

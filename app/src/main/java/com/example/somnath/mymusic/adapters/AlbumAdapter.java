@@ -45,9 +45,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
             mTextView=(TextView)v.findViewById(R.id.albumname);
             mTextView2=(TextView) v.findViewById(R.id.artistname);
 
-
-
-
         }
     }
     @Override

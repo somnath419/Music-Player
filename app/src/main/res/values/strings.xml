@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Music</string>
+    <string name="app_name">MyMusic</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -21,6 +21,19 @@
     <string name="playing_music_from_sd_card">Playing Music from SD Card</string>
     <string name="play">Play</string>
     <string name="stop">Stop</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Broadcast Tutorial</string>
+    <string name="notificationtitle">Broadcast Tutorial</string>
+    <string name="lbltitle">"Title : "</string>
+    <string name="lbltext">"Text : "</string>
+    <string name="BroadcastReceiver">Broadcast Receiver</string>
+    <string name="wifioff">WIFI OFF</string>
+    <string name="wifion">WIFI ON</string>
+
+
+
 
 
 

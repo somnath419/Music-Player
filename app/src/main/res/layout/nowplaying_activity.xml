@@ -18,7 +18,6 @@
         android:layout_height="wrap_content"
         android:layout_width="77dp"
         android:layout_marginBottom="43dp"
-        android:onClick="onclick"
         android:text="Pause"
 
         android:layout_alignParentBottom="true"
