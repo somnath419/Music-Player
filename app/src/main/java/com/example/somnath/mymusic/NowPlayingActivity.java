@@ -1,7 +1,5 @@
 package com.example.somnath.mymusic;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -16,37 +14,34 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 
-public class NowPlayingActivity extends AppCompatActivity{
-            private  MediaPlayer player;
-       private Context context;
+public class NowPlayingActivity extends AppCompatActivity
+{
+    private Context context;
+    private MyMusicService mBoundService;
+    private boolean mIsBound = false;
     private  boolean isplaying;
-
-
-    public ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
-    private ServiceConnection serviceConnection = new AudioPlayerServiceConnection();
-    private  MyMusicService audioPlayer;
-    private Intent audioPlayerIntent;
-
+    private long idsong;
+    private  String strin;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState)
+    {   super.onCreate(savedInstanceState);
         setContentView(R.layout.nowplaying_activity);
-        Intent intent= getIntent();
-        String strin= intent.getStringExtra("isn");
+
         context=this;
+        Bundle intent= getIntent().getExtras();
+         strin= intent.getString("song_string");
 
-        long id = (long) intent.getExtras().get("ins");
+         idsong=intent.getLong("song_id");
 
-        player=new MediaPlayer();
-        isplaying=player.isPlaying();
-
-
+        Toast.makeText(context,strin,Toast.LENGTH_SHORT).show();
 
         Animation animationToLeft = new TranslateAnimation(400, -400, 0, 0);
         animationToLeft.setDuration(12000);
@@ -62,61 +57,139 @@ public class NowPlayingActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
 
-
-                if(isplaying)
-                {
-                    Intent intent = new Intent(MyMusicService.PAUSE_TRACK);
-                    intent.putExtra(MyMusicService.PAUSE_TRACK,"Pause");
-                    context.sendBroadcast(intent);
-                }
+                if(isplaYing())
+                    basePause();
                 else
-                    {  Intent intent = new Intent(MyMusicService.RESUME_TRACK);
-                        intent.putExtra(MyMusicService.RESUME_TRACK,"RESUME");
-                        context.sendBroadcast(intent);
+                    baseResume();
 
-
-                    }
             }
         });
 
 
 
-        Intent msgIntent = new Intent(context, MyMusicService.class);
-        msgIntent.putExtra(MyMusicService.PLAY_TRACK, id);
-        context.startService(msgIntent);
-
-        Intent intentr = new Intent(MyMusicService.PLAY_TRACK);
-        intentr.putExtra("songIndex", id);
-        context.sendBroadcast(intentr);
-
-
-
-
-        audioPlayerIntent = new Intent(this, MyMusicService.class);
-        bindService(audioPlayerIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-
-
-
+        doBindService();
 
     }
 
-    private final class AudioPlayerServiceConnection implements ServiceConnection {
-        public void onServiceConnected(ComponentName className, IBinder baBinder) {
-            audioPlayer = ((MyMusicService.AudioPlayerBinder) baBinder).getService();
-            startService(audioPlayerIntent);
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        try
+        {   if(mBoundService!=null)
+            {
+                mBoundService.play(idsong);
+            }
         }
-
-        public void onServiceDisconnected(ComponentName className) {
-            audioPlayer = null;
+        catch(Exception e)
+        {   e.printStackTrace();
         }
     }
 
     @Override
-    protected void onDestroy() {
-        // TODO Auto-generated method stub
-        unbindService(serviceConnection);
-        super.onDestroy();
+    protected void onStop()
+    {
+        super.onStop();
+    }
 
+
+
+    protected void baseResume()
+    {
+        try
+        {
+            if(mBoundService!=null)
+            {
+                mBoundService.resume();
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    protected void basePause()
+    {
+        try
+        {
+            if(mBoundService!=null)
+            {
+                mBoundService.pause();
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    protected boolean isplaYing()
+    {
+        return mBoundService.isplaying();
+    }
+
+
+
+
+    private ServiceConnection mConnection = new ServiceConnection()
+    {
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service. Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            mBoundService = ((MyMusicService.LocalBinder) service).getService();
+
+            if(mBoundService!=null)
+            {
+                mBoundService.play(idsong);
+            }
+        }
+
+        public void onServiceDisconnected(ComponentName className)
+        {  // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+
+            mBoundService.destroy();
+
+        }
+    };
+
+    private void doBindService()
+    {
+        // Establish a connection with the service. We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+
+        Intent i = new Intent(getApplicationContext(), MyMusicService.class);
+        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        startService(i);
+        mIsBound = true;
+    }
+
+    private void doUnbindService()
+    {
+        if (mIsBound)
+        {   // Detach our existing connection.
+            unbindService(mConnection);
+            stopService(new Intent(context,MyMusicService.class));
+
+            mIsBound = false;
+        }
+    }
+
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
     }
 
 

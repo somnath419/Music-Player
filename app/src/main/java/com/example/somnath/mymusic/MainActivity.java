@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity
     //This is our tablayout
     private TabLayout tabLayout;
     private  Menu menu;
+    private  NavigationView navigationView;
 
     //This is our viewPager
     private ViewPager viewPager;
@@ -74,6 +75,10 @@ public class MainActivity extends AppCompatActivity
 
         //Adding onTabSelectedListener to swipe views
         tabLayout.setOnTabSelectedListener(this);
+
+
+         navigationView =(NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
 
 
@@ -119,6 +124,14 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_main_drawer, menu);
+
+        return true;
     }
 
 

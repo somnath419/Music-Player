@@ -2,6 +2,7 @@ package com.example.somnath.mymusic.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,8 +85,13 @@ public class SongAdapter extends BaseAdapter {
 
 
                 Intent intent1 = new Intent(v.getContext(), NowPlayingActivity.class);
-                intent1.putExtra("ins", id);
-                intent1.putExtra("isn", strin);
+
+                Bundle bun = new Bundle();
+                bun.putLong("song_id",id);
+                bun.putString("song_string",strin);
+
+                intent1.putExtras(bun);
+
                 v.getContext().startActivity(intent1);
 
 
