@@ -31,9 +31,9 @@
     <string name="BroadcastReceiver">Broadcast Receiver</string>
     <string name="wifioff">WIFI OFF</string>
     <string name="wifion">WIFI ON</string>
-
-
-
+    <string name="play_pause">Play/Pause</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
 
 
 

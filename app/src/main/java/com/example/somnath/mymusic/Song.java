@@ -28,6 +28,16 @@ public class Song {
         Artist=artists;
 
     }
+    public Song(long id, String artist,String songTitle,String albums,String genres,String albumimage) {
+        Id =id;
+        title=songTitle;
+        Artist=artist;
+        a_lbums=albums;
+        genre_s=genres;
+        albumart=albumimage;
+    }
+
+
 
     public String getTitle(){return title;}
     public String getArtist(){return Artist;}

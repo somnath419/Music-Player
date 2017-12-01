@@ -3,17 +3,53 @@
     android:layout_height="match_parent">
 
 
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/notification_title"
+       android:maxLines="1"
+       android:textSize="20sp"
+       android:text="Hello"
+       />
 
+ <RelativeLayout android:id="@+id/lin"
+     android:layout_height="match_parent"
+     android:layout_width="match_parent"
+     android:layout_marginTop="20sp"
+     android:layout_below="@+id/notification_title"
+    >
 
-    <Button android:id="@+id/button1"
+    <Button android:id="@+id/previous_not"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:text="Pre"
+
         />
     <Button
-        android:id="@+id/play_pause"
+        android:id="@+id/playPause_not"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/button1"
+        android:text="Play"
+        android:layout_toEndOf="@+id/previous_not"
         />
+
+    <Button
+        android:id="@+id/next_not"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:layout_toEndOf="@+id/playPause_not"
+        />
+
+    <Button
+        android:id="@+id/stop_not"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+        android:layout_toEndOf="@+id/next_not"
+        />
+
+    </RelativeLayout>
+
 
 </RelativeLayout>

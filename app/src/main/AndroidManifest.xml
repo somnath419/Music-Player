@@ -123,6 +123,13 @@
 
         </service>
 
+        <receiver android:name=".NowPlayingActivity$NotificationListener" >
+
+            <intent-filter>
+                <action android:name="someAction" />
+            </intent-filter>
+        </receiver>
+
 
     </application>
 

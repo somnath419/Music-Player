@@ -106,10 +106,7 @@ public class AllSongsFragment extends Fragment {
           {
               musicCursor.close();
           }
-
     }
-
-
 
 }
 

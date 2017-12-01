@@ -35,10 +35,7 @@ public class SongAdapter extends BaseAdapter {
 
     }
 
-    public  SongAdapter(Context c)
-    {
-        context=c;
-    }
+
 
 
     @Override
@@ -91,6 +88,7 @@ public class SongAdapter extends BaseAdapter {
                 bun.putString("song_string",strin);
 
                 intent1.putExtras(bun);
+                intent1.putExtra("f",1);
 
                 v.getContext().startActivity(intent1);
 

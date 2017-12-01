@@ -84,6 +84,7 @@ public class MyMusicService extends Service
         {                Log.e("MUSIC SERVICE", "Error Setting Data Source", e);
 
         }
+        player.setLooping(true);
         player.start();
     }
 
