@@ -1,5 +1,6 @@
 package com.example.somnath.mymusic;
 
+import android.Manifest;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,7 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -27,6 +30,8 @@ import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -48,11 +53,15 @@ public class NowPlayingActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nowplaying_activity);
 
+
+
         doBindService();
 
         final TextView textView = (TextView) findViewById(R.id.nameofsong);
 
-        final ImageView imageView = (ImageView) findViewById(R.id.largeimage);
+        ImageView imageView = (ImageView) findViewById(R.id.largeimage);
+
+
 
         Button play_pause = (Button) findViewById(R.id.play_pause);
         Button stop = (Button) findViewById(R.id.stop);
@@ -65,17 +74,28 @@ public class NowPlayingActivity extends AppCompatActivity
         getSongList();
 
         if ((getIntent().getIntExtra("f", 0) == 1)) {
+            baseStop();
+            doUnbindService();
+            doBindService();
             Bundle intent = getIntent().getExtras();
             strin = intent.getString("song_string");
             idsong = intent.getLong("song_id");
             textView.setText(strin);
-        } else {
+        }
+        else
+
+        {
+            baseStop();
+            doUnbindService();
+            doBindService();
             song = list.get(count);
             idsong = song.getId();
             strin = song.getTitle();
             textView.setText(strin);
 
         }
+
+
 
         //play or pause button
 
@@ -103,6 +123,8 @@ public class NowPlayingActivity extends AppCompatActivity
 
         //play next song
 
+
+
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,6 +139,10 @@ public class NowPlayingActivity extends AppCompatActivity
 
             }
         });
+
+
+
+
 
         //play previous song
         previous.setOnClickListener(new View.OnClickListener() {
@@ -139,6 +165,9 @@ public class NowPlayingActivity extends AppCompatActivity
         Toast.makeText(context, String.valueOf(idsong), Toast.LENGTH_SHORT).show();
 
         CustomNotification();
+
+
+
     }
 
 
@@ -148,23 +177,20 @@ public class NowPlayingActivity extends AppCompatActivity
     {
         super.onStart();
         try
-        {   if(mBoundService!=null)
-            {
-                mBoundService.play(idsong);
-            }
+        {
+            if(mBoundService!=null)
+        mBoundService.play(idsong);
+
         }
         catch(Exception e)
         {   e.printStackTrace();
         }
     }
 
-
     @Override
     protected void onPause()
     {
         super.onPause();
-
-
     }
 
     @Override
@@ -172,8 +198,6 @@ public class NowPlayingActivity extends AppCompatActivity
     {
         super.onStop();
     }
-
-
 
     protected void baseResume()
     {
@@ -225,35 +249,17 @@ public class NowPlayingActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
-
-
-
-
-
+    //mconnection
     private ServiceConnection mConnection = new ServiceConnection()
     {
         public void onServiceConnected(ComponentName className, IBinder service)
-        {
-            // This is called when the connection with the service has been
-            // established, giving us the service object we can use to
-            // interact with the service. Because we have bound to a explicit
-            // service that we know is running in our own process, we can
-            // cast its IBinder to a concrete class and directly access it.
-            mBoundService = ((MyMusicService.LocalBinder) service).getService();
-
+        {mBoundService = ((MyMusicService.LocalBinder) service).getService();
             if(mBoundService!=null)
-            {
                 mBoundService.play(idsong);
-            }
         }
 
         public void onServiceDisconnected(ComponentName className)
-        {  // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            // Because it is running in our same process, we should never
-            // see this happen.
-
-            mBoundService.destroy();
+        {mBoundService.destroy();
 
         }
     };
@@ -262,13 +268,7 @@ public class NowPlayingActivity extends AppCompatActivity
 
 
     private void doBindService()
-    {
-        // Establish a connection with the service. We use an explicit
-        // class name because we want a specific service implementation that
-        // we know will be running in our own process (and thus won't be
-        // supporting component replacement by other applications).
-
-        Intent i = new Intent(getApplicationContext(), MyMusicService.class);
+    {  Intent i = new Intent(getApplicationContext(), MyMusicService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         startService(i);
         mIsBound = true;
@@ -280,7 +280,6 @@ public class NowPlayingActivity extends AppCompatActivity
         {   // Detach our existing connection.
             unbindService(mConnection);
             stopService(new Intent(context,MyMusicService.class));
-
             mIsBound = false;
         }
     }
@@ -359,33 +358,31 @@ public class NowPlayingActivity extends AppCompatActivity
 
         remoteViews.setTextViewText(R.id.notification_title,strin);
 
-        Intent previousclick = new Intent(context,NotificationListener.class);
+        Intent previousclick = new Intent(this,MainActivity.class);
         previousclick.putExtra("previous",1);
 
 
-       Intent nextclick =new Intent("someAction");
+        Intent nextclick =new Intent("someAction");
 
-        Intent play_pause = new Intent(context,NotificationListener.class);
-        play_pause.putExtra("play",3);
+        Intent play_pause = new Intent(this,MyMusicService.class);
+        play_pause.putExtra("play",1);
 
         Intent stop = new Intent(context,NotificationListener.class);
-        stop.putExtra("stop",4);
+        stop.putExtra("stop",1);
 
-        PendingIntent previous = PendingIntent.getBroadcast(context,0,previousclick, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent next = PendingIntent.getBroadcast(context,0,nextclick, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent playPause = PendingIntent.getBroadcast(context,0,play_pause, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent  Stop = PendingIntent.getBroadcast(context,0,stop,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pre = PendingIntent.getActivity(this, 0,previousclick,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
-        remoteViews.setPendingIntentTemplate(R.id.previous_not,previous);
-        remoteViews.setPendingIntentTemplate(R.id.playPause_not,playPause);
-        remoteViews.setPendingIntentTemplate(R.id.next_not,next);
-        remoteViews.setPendingIntentTemplate(R.id.stop_not,Stop);
+        PendingIntent next = PendingIntent.getBroadcast(this,0,nextclick, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent playPause = PendingIntent.getService(this,0,play_pause, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent  Stop = PendingIntent.getBroadcast(this,0,stop,PendingIntent.FLAG_ONE_SHOT);
 
+        remoteViews.setOnClickPendingIntent(R.id.previous_not,pre);
 
+        remoteViews.setOnClickPendingIntent(R.id.playPause_not,playPause);
 
-
-
-
+        remoteViews.setOnClickPendingIntent(R.id.next_not,next);
+        remoteViews.setOnClickPendingIntent(R.id.stop_not,Stop);
 
 
         // Create Notification Manager
@@ -395,20 +392,9 @@ public class NowPlayingActivity extends AppCompatActivity
 
     }
 
-    public class NotificationListener extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-           if(intent.getIntExtra("previous",0)==1)
-
-            Toast.makeText(context,"Received", Toast.LENGTH_SHORT).show();
 
 
 
-
-        }
-
-    }
 
 }
 

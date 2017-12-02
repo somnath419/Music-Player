@@ -1,6 +1,7 @@
 package com.example.somnath.mymusic;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
@@ -18,11 +19,14 @@ import android.widget.Toast;
 
 
 public class MyMusicService extends Service
+
 {
     // This is the object that receives interactions from clients. See RemoteService for a more complete example.
     private final IBinder mBinder = new LocalBinder();
     private MediaPlayer player;
     private  Context context;
+    private MediaPlayer.OnCompletionListener onCompletionListener;
+    private boolean complete=false;
 
     /**
      * Class for clients to access. Because we know this service always runs in
@@ -47,6 +51,8 @@ public class MyMusicService extends Service
     {
         // We want this service to continue running until it is explicitly stopped, so return sticky.
         player=new MediaPlayer();
+
+
 
         return START_STICKY;
     }
@@ -84,7 +90,6 @@ public class MyMusicService extends Service
         {                Log.e("MUSIC SERVICE", "Error Setting Data Source", e);
 
         }
-        player.setLooping(true);
         player.start();
     }
 
@@ -103,7 +108,7 @@ public class MyMusicService extends Service
     {
         try
         {
-            if(null != player && !player.isPlaying())
+            if(player !=null && !player.isPlaying())
             {
                 player.start();
             }
@@ -133,5 +138,10 @@ public class MyMusicService extends Service
     {
         return player.isPlaying();
     }
+
+
+
+
+
 
 }

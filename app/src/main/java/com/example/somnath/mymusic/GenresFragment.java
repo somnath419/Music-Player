@@ -36,10 +36,15 @@ public class GenresFragment extends Fragment{
             if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+
 // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
 // app-defined int constant
                 return v;
-            }}
+            }
+
+
+
+        }
 
         list=(ListView)v.findViewById(R.id.grid_view);
         songList = new ArrayList<Song>();
