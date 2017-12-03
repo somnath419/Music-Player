@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:id="@+id/linearlayouta"
-    android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-        <LinearLayout android:id="@+id/iccc"
-            android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
 
-    <TextView android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:id="@+id/albums_text"/>
+    <View
+        android:layout_width="20sp"
+        android:layout_height="30sp"
+        android:id="@+id/space"
+        android:background="@color/colorwhite" />
 
-    <TextView android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:id="@+id/artist_albums"/>
+    <TextView
+        android:id="@+id/artist_name"
+        android:layout_width="match_parent"
+        android:textSize="25sp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:maxLines="1"
+        android:layout_toEndOf="@+id/space"
+        />
 
-        </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10sp"
+        android:id="@+id/space2"
+        android:layout_below="@id/artist_name"
+        android:background="@color/colorwhite" />
 
-</LinearLayout>
+
+
+</RelativeLayout>

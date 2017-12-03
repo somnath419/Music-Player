@@ -9,12 +9,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
-import com.example.somnath.mymusic.adapters.ArtistAdapter;
+import com.example.somnath.mymusic.adapters.MyAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,11 +27,13 @@ public class ArtistsFragment extends Fragment{
 
 
     private ArrayList<Song> songList;
-    private ListView list;
+    private RecyclerView.LayoutManager mLayoutManager,mLayoutManager2,mLayoutManager3,mLayoutManager4;
+
+    private RecyclerView recyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.listviewlist, container, false);
+        View v = inflater.inflate(R.layout.artist_mainview, container, false);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
@@ -40,7 +44,7 @@ public class ArtistsFragment extends Fragment{
                 return v;
             }}
 
-        list=(ListView) v.findViewById(R.id.grid_view);
+        recyclerView=(RecyclerView)v.findViewById(R.id.recyclerArtist);
         songList = new ArrayList<Song>();
 
 
@@ -53,8 +57,13 @@ public class ArtistsFragment extends Fragment{
 
             }});
 
-        ArtistAdapter songAdt = new ArtistAdapter(getContext(), songList);
-        list.setAdapter(songAdt);
+        mLayoutManager = new LinearLayoutManager(getContext());
+
+        recyclerView.setLayoutManager(mLayoutManager);
+
+
+        MyAdapter songAdt=new MyAdapter(getContext(),songList,"artists");
+        recyclerView.setAdapter(songAdt);
 
 
         return v;
@@ -72,7 +81,6 @@ public class ArtistsFragment extends Fragment{
             int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int titleId = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int titleArtist = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int titleAlbum_key = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_KEY);
             int titleAlbums=musicCursor.getColumnIndex(MediaStore.Audio.Albums._ID);
             int titleAlbumId = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             int titleGenres=musicCursor.getColumnIndex(MediaStore.Audio.Genres._ID);

@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import com.example.somnath.mymusic.AlbumsFragment;
 import com.example.somnath.mymusic.AllSongsFragment;
 import com.example.somnath.mymusic.ArtistsFragment;
-import com.example.somnath.mymusic.GenresFragment;
 
 
 //Extending FragmentStatePagerAdapter
@@ -37,13 +36,13 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 fragment= new AlbumsFragment();
                 break;
             case 2:
-                fragment=new AllSongsFragment();
+                fragment= new ArtistsFragment();
                 break;
             case 3:
-                fragment=new AllSongsFragment();
+                fragment= new AllSongsFragment();
                 break;
             case 4:
-                fragment=new AllSongsFragment();
+                fragment= new AllSongsFragment();
                 break;
 
         }

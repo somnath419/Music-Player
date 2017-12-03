@@ -60,11 +60,10 @@ public class SongAdapter extends BaseAdapter {
 
 
         //map to song layout
-        LinearLayout songLay = (LinearLayout) songInf.inflate(R.layout.artistlists, parent, false);
+        LinearLayout songLay = (LinearLayout) songInf.inflate(R.layout.layout_albumsongs, parent, false);
         //get title and artist views
         TextView songView = (TextView) songLay.findViewById(R.id.albums_text);
         TextView artistView = (TextView) songLay.findViewById(R.id.artist_albums);
-        LinearLayout linearLayout = (LinearLayout) songLay.findViewById(R.id.iccc);
 
         //get song using position
         Song currSong = songs.get(position);
@@ -72,7 +71,7 @@ public class SongAdapter extends BaseAdapter {
         songView.setText(currSong.getTitle());
         artistView.setText(currSong.getArtist());
 
-        linearLayout.setOnClickListener(new View.OnClickListener() {
+        songView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Song currSong = songs.get(position);

@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
-import com.example.somnath.mymusic.adapters.AlbumAdapter;
+import com.example.somnath.mymusic.adapters.MyAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,7 +71,7 @@ public class AlbumsFragment extends Fragment {
         recyclerView1.setLayoutManager(mLayoutManager);
 
 
-        mAdapter1 = new AlbumAdapter(getContext(), songList);
+        mAdapter1 = new MyAdapter(getContext(), songList,"albums");
 
         recyclerView1.setAdapter(mAdapter1);
 

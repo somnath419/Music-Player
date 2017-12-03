@@ -11,15 +11,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.somnath.mymusic.adapters.AlbumAdapter;
 import com.example.somnath.mymusic.adapters.SongAdapter;
 
 import java.util.ArrayList;
@@ -36,7 +32,7 @@ public class AllSongsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.listviewlist, container, false);
+        View v = inflater.inflate(R.layout.player, container, false);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
@@ -48,7 +44,7 @@ public class AllSongsFragment extends Fragment {
             }}
 
 
-        list=(ListView)v. findViewById(R.id.grid_view);
+        list=(ListView)v. findViewById(R.id.list_item);
         songList = new ArrayList<Song>();
 
 

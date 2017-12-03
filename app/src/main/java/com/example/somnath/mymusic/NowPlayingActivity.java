@@ -292,20 +292,20 @@ public class NowPlayingActivity extends AppCompatActivity
     }
 
 
-    public void getSongList() {
+        public void getSongList() {
+
         ContentResolver musicResolver =getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-//get columns
+            if (musicCursor != null && musicCursor.moveToFirst()) {
+
+            //get columns
             int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int titleArtist=musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int titleAlbums=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
             int titleGenres =musicCursor.getColumnIndex(MediaStore.Audio.Genres._ID);
-
-
 
 
             //add songs to list
