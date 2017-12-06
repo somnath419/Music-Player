@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.somnath.mymusic.NowPlayingActivity;
@@ -60,18 +60,17 @@ public class SongAdapter extends BaseAdapter {
 
 
         //map to song layout
-        LinearLayout songLay = (LinearLayout) songInf.inflate(R.layout.layout_albumsongs, parent, false);
+        RelativeLayout songLay = (RelativeLayout) songInf.inflate(R.layout.layout_allsong_texts, parent, false);
         //get title and artist views
         TextView songView = (TextView) songLay.findViewById(R.id.albums_text);
         TextView artistView = (TextView) songLay.findViewById(R.id.artist_albums);
-
         //get song using position
         Song currSong = songs.get(position);
         //get title and artist string
         songView.setText(currSong.getTitle());
         artistView.setText(currSong.getArtist());
 
-        songView.setOnClickListener(new View.OnClickListener() {
+        songLay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Song currSong = songs.get(position);

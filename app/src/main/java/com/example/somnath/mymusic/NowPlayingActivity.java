@@ -12,9 +12,12 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
@@ -26,18 +29,27 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 
-public class NowPlayingActivity extends AppCompatActivity
+public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener
 {
     private Context context;
     private MyMusicService mBoundService;
@@ -46,13 +58,15 @@ public class NowPlayingActivity extends AppCompatActivity
     private  String strin;
     private ArrayList<Song> list;
     private  Song song;
-    private  static int count=0;
+    private static int count=0;
+    private SeekBar seekBar1;
+    boolean userTouch;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nowplaying_activity);
-
 
 
         doBindService();
@@ -62,15 +76,36 @@ public class NowPlayingActivity extends AppCompatActivity
         ImageView imageView = (ImageView) findViewById(R.id.largeimage);
 
 
+        final ImageButton play_pause = (ImageButton) findViewById(R.id.play);
+        ImageButton stop = (ImageButton) findViewById(R.id.stop);
 
-        Button play_pause = (Button) findViewById(R.id.play_pause);
-        Button stop = (Button) findViewById(R.id.stop);
-        Button previous = (Button) findViewById(R.id.previous);
-        Button next = (Button) findViewById(R.id.next);
+
+        ImageButton nextt = (ImageButton) findViewById(R.id.nex33t);
+
+        nextt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mBoundService.seeking((int) (mBoundService.postion() + 50000));
+
+            }
+        });
+
+        final ImageButton pause = (ImageButton) findViewById(R.id.pause);
+        play_pause.setVisibility(View.GONE);
+
+        ImageButton previous = (ImageButton) findViewById(R.id.previous);
+        ImageButton next = (ImageButton) findViewById(R.id.next);
+
+        seekBar1 = (SeekBar) findViewById(R.id.seekBar1);
+        seekBar1.setOnSeekBarChangeListener(this);
+        seekBar1.setProgress(0);
+
 
         context = this;
 
         list = new ArrayList<Song>();
+
         getSongList();
 
         if ((getIntent().getIntExtra("f", 0) == 1)) {
@@ -81,8 +116,7 @@ public class NowPlayingActivity extends AppCompatActivity
             strin = intent.getString("song_string");
             idsong = intent.getLong("song_id");
             textView.setText(strin);
-        }
-        else
+        } else
 
         {
             baseStop();
@@ -96,17 +130,30 @@ public class NowPlayingActivity extends AppCompatActivity
         }
 
 
-
         //play or pause button
 
         play_pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (isplaYing())
-                    basePause();
-                else
+                if (!isplaYing()) {
                     baseResume();
+                    pause.setVisibility(View.VISIBLE);
+                    play_pause.setVisibility(View.GONE);
+                }
+
+            }
+        });
+
+        pause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (isplaYing()) {
+                    basePause();
+                    pause.setVisibility(View.GONE);
+                    play_pause.setVisibility(View.VISIBLE);
+                }
 
             }
         });
@@ -124,11 +171,11 @@ public class NowPlayingActivity extends AppCompatActivity
         //play next song
 
 
-
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                baseStop();
+                if (count < list.size())
+                    baseStop();
                 doUnbindService();
                 doBindService();
                 song = list.get(count = count + 10);
@@ -139,9 +186,6 @@ public class NowPlayingActivity extends AppCompatActivity
 
             }
         });
-
-
-
 
 
         //play previous song
@@ -162,12 +206,60 @@ public class NowPlayingActivity extends AppCompatActivity
             }
         });
 
-        Toast.makeText(context, String.valueOf(idsong), Toast.LENGTH_SHORT).show();
 
         CustomNotification();
 
 
 
+
+
+    }
+
+
+    public void getSeekBarStatus(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                int total=mBoundService.totalduration();
+                int CurrentPosition=0;
+                seekBar1.setMax(total);
+
+                while(CurrentPosition<total)
+                {
+                    try {
+                        Thread.sleep(1000);
+                        CurrentPosition=mBoundService.postion();
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                    seekBar1.setProgress(CurrentPosition);
+                }
+            }
+        }).start();
+
+
+
+    }
+
+
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+        if(fromUser){
+Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHORT).show();        }
+
+        final long Minutes=((progress/1000)/60);
+        final int Seconds=((progress/1000)%60);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
     }
 
 
@@ -179,12 +271,13 @@ public class NowPlayingActivity extends AppCompatActivity
         try
         {
             if(mBoundService!=null)
-        mBoundService.play(idsong);
+               mBoundService.play(idsong);
 
         }
         catch(Exception e)
         {   e.printStackTrace();
         }
+
     }
 
     @Override
@@ -198,6 +291,14 @@ public class NowPlayingActivity extends AppCompatActivity
     {
         super.onStop();
     }
+
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+    }
+
 
     protected void baseResume()
     {
@@ -215,7 +316,7 @@ public class NowPlayingActivity extends AppCompatActivity
     }
 
 
-    protected void basePause()
+      protected void basePause()
     {
         try
         {
@@ -249,6 +350,7 @@ public class NowPlayingActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
     //mconnection
     private ServiceConnection mConnection = new ServiceConnection()
     {
@@ -292,7 +394,7 @@ public class NowPlayingActivity extends AppCompatActivity
     }
 
 
-        public void getSongList() {
+        private void getSongList() {
 
         ContentResolver musicResolver =getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -391,6 +493,10 @@ public class NowPlayingActivity extends AppCompatActivity
         notificationmanager.notify(0, builder.build());
 
     }
+
+
+
+
 
 
 

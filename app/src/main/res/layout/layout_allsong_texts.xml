@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
+    android:id="@+id/mainrelative"
     android:layout_height="match_parent">
+
+     <View
+         android:layout_width="20sp"
+         android:layout_height="30sp"
+         android:id="@+id/spaceall_list"
+         android:background="@color/colorwhite" />
 
      <TextView
         android:id="@+id/albums_text"
@@ -12,6 +19,7 @@
         android:layout_height="wrap_content"
          android:textColor="@color/colorAccent"
          android:maxLines="1"
+         android:layout_toEndOf="@id/spaceall_list"
 
 
         />
@@ -20,6 +28,19 @@
          android:id="@+id/artist_albums"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
+         android:layout_below="@id/albums_text"
          android:maxLines="1"
+         android:layout_toEndOf="@+id/spaceall_list"
          />
-</LinearLayout>
+
+
+     <View
+         android:layout_width="match_parent"
+         android:layout_height="10sp"
+         android:id="@+id/space25"
+         android:layout_below="@id/artist_albums"
+         android:background="@color/colorwhite" />
+
+
+
+</RelativeLayout>

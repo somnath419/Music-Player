@@ -6,9 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import java.util.ArrayList;
 
 
 /**
@@ -20,7 +17,7 @@ public class ArtistSongs extends AppCompatActivity {
     {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.player);
+        setContentView(R.layout.allsong_mainview);
         ListView listView=(ListView) findViewById(R.id.list_item);
 
         Intent intent=getIntent();
