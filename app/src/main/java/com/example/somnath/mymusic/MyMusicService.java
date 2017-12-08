@@ -22,8 +22,10 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import static com.example.somnath.mymusic.NowPlayingActivity.count;
 
-public class MyMusicService extends Service implements MediaPlayer.OnCompletionListener
+
+public class MyMusicService extends Service implements MediaPlayer.OnCompletionListener,MediaPlayer.OnPreparedListener
 
 {
     // This is the object that receives interactions from clients. See RemoteService for a more complete example.
@@ -36,7 +38,7 @@ public class MyMusicService extends Service implements MediaPlayer.OnCompletionL
     private  Song song;
     private NowPlayingActivity nowPlayingActivity;
     private  long idsong,idsong2;
-    private  static int count=0;
+
 
     /**
      * Class for clients to access. Because we know this service always runs in
@@ -87,6 +89,7 @@ public class MyMusicService extends Service implements MediaPlayer.OnCompletionL
 
     public void play(long res)
     {
+        player.reset();
         Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, res);
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try
@@ -158,6 +161,8 @@ public class MyMusicService extends Service implements MediaPlayer.OnCompletionL
         }
     }
 
+    //return isplaying
+
     public  boolean isplaying()
     {
         return player.isPlaying();
@@ -169,6 +174,12 @@ public class MyMusicService extends Service implements MediaPlayer.OnCompletionL
 
       player.seekTo(arg);
         resume();
+    }
+
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+
     }
 
     @Override

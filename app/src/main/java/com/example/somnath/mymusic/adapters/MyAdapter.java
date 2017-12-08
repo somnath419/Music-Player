@@ -76,7 +76,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             // Just as an example, return 0 or 2 depending on position
             // Note that unlike in ListView adapters, types don't have to be contiguous
 
-           if(st=="artists")
+           if(st.equals("artists"))
                return 2;
             else
                 return 0;

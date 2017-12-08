@@ -113,14 +113,17 @@
 
         </service>
 
-        <receiver android:name=".NotificationListener"
-            >
 
-        <intent-filter>
-            <action android:name="someAction" />
-        </intent-filter>
+        <receiver android:name=".NowPlayingActivity$NotificationListener">
 
-    </receiver>
+            <intent-filter >
+                <action android:name="previous"/>
+                <action android:name="next"/>
+                <action android:name="play"/>
+                <action android:name="stop"/>
+                </intent-filter>
+
+        </receiver>
 
 
 

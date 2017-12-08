@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -52,15 +53,16 @@ import java.util.concurrent.TimeUnit;
 public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener
 {
     private Context context;
-    private MyMusicService mBoundService;
+    private static MyMusicService mBoundService;
     private boolean mIsBound = false;
-    private long idsong;
-    private  String strin;
-    private ArrayList<Song> list;
-    private  Song song;
-    private static int count=0;
+    private static long idsong;
+    private static String strin;
+    private static ArrayList<Song> list;
+    private static Song song;
+    public static int count=0;
     private SeekBar seekBar1;
     boolean userTouch;
+    private  static  TextView textView;
 
 
     @Override
@@ -71,7 +73,7 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
 
         doBindService();
 
-        final TextView textView = (TextView) findViewById(R.id.nameofsong);
+       textView = (TextView) findViewById(R.id.nameofsong);
 
         ImageView imageView = (ImageView) findViewById(R.id.largeimage);
 
@@ -87,6 +89,7 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
             public void onClick(View v) {
 
                 mBoundService.seeking((int) (mBoundService.postion() + 50000));
+                seekBar1.setProgress((int) (mBoundService.postion() + 50000));
 
             }
         });
@@ -178,7 +181,7 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
                     baseStop();
                 doUnbindService();
                 doBindService();
-                song = list.get(count = count + 10);
+                song = list.get(count = count + 5);
                 idsong = song.getId();
 
                 strin = song.getTitle();
@@ -208,7 +211,6 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
 
 
         CustomNotification();
-
 
 
 
@@ -248,7 +250,9 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
         if(fromUser){
-Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHORT).show();        }
+
+              mBoundService.seeking(progress);
+        }
 
         final long Minutes=((progress/1000)/60);
         final int Seconds=((progress/1000)%60);
@@ -268,6 +272,9 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
     protected void onStart()
     {
         super.onStart();
+
+        seekBar1.setProgress(20);
+
         try
         {
             if(mBoundService!=null)
@@ -277,6 +284,8 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
         catch(Exception e)
         {   e.printStackTrace();
         }
+
+
 
     }
 
@@ -300,7 +309,7 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
     }
 
 
-    protected void baseResume()
+    private static void baseResume()
     {
         try
         {
@@ -316,7 +325,7 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
     }
 
 
-      protected void basePause()
+      private static void basePause()
     {
         try
         {
@@ -331,12 +340,12 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
         }
     }
 
-    protected boolean isplaYing()
+    private static boolean isplaYing()
     {
         return mBoundService.isplaying();
     }
 
-    protected void baseStop()
+    private static void baseStop()
     {
         try
         {
@@ -352,7 +361,7 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
     }
 
     //mconnection
-    private ServiceConnection mConnection = new ServiceConnection()
+    private static ServiceConnection mConnection = new ServiceConnection()
     {
         public void onServiceConnected(ComponentName className, IBinder service)
         {mBoundService = ((MyMusicService.LocalBinder) service).getService();
@@ -369,7 +378,7 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
 
 
 
-    private void doBindService()
+    private  void doBindService()
     {  Intent i = new Intent(getApplicationContext(), MyMusicService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         startService(i);
@@ -431,6 +440,8 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
     }
 
 
+    // Custom Notification
+
     public void CustomNotification() {
 
         // Using RemoteViews to bind custom layouts into Notification
@@ -448,7 +459,7 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 // Set Icon
-                .setSmallIcon(R.drawable.ic_menu_share)
+                .setSmallIcon(R.drawable.play)
                 .setContentTitle("Now Playing")
                 // Set Ticker Message
                 // Dismiss Notification
@@ -460,29 +471,30 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
 
         remoteViews.setTextViewText(R.id.notification_title,strin);
 
-        Intent previousclick = new Intent(this,MainActivity.class);
+
+
+
+        Intent previousclick = new Intent("previous");
         previousclick.putExtra("previous",1);
 
 
-        Intent nextclick =new Intent("someAction");
+        Intent nextclick = new Intent("next");
+        nextclick.putExtra("extra", "hello");
 
-        Intent play_pause = new Intent(this,MyMusicService.class);
-        play_pause.putExtra("play",1);
+        Intent play_pause = new Intent("play");
+        play_pause.putExtra("play",3);
 
-        Intent stop = new Intent(context,NotificationListener.class);
-        stop.putExtra("stop",1);
+        Intent stop = new Intent("stop");
+        stop.putExtra("stop",4);
 
-        PendingIntent pre = PendingIntent.getActivity(this, 0,previousclick,
-                PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent next = PendingIntent.getBroadcast(this,0,nextclick, PendingIntent.FLAG_ONE_SHOT);
-        PendingIntent playPause = PendingIntent.getService(this,0,play_pause, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent  Stop = PendingIntent.getBroadcast(this,0,stop,PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pre = PendingIntent.getBroadcast(this, 0,previousclick, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent next = PendingIntent.getBroadcast(this,0,nextclick, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent playPause = PendingIntent.getBroadcast(this,0,play_pause, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent  Stop = PendingIntent.getBroadcast(this,0,stop,PendingIntent.FLAG_UPDATE_CURRENT);
 
         remoteViews.setOnClickPendingIntent(R.id.previous_not,pre);
-
         remoteViews.setOnClickPendingIntent(R.id.playPause_not,playPause);
-
         remoteViews.setOnClickPendingIntent(R.id.next_not,next);
         remoteViews.setOnClickPendingIntent(R.id.stop_not,Stop);
 
@@ -497,10 +509,52 @@ Toast.makeText(getApplicationContext(),String.valueOf(progress),Toast.LENGTH_SHO
 
 
 
+        public static class NotificationListener extends BroadcastReceiver {
+
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                String string=intent.getAction();
+
+                if(string.equals("previous")){
+
+                    Toast.makeText(context,"Previous Clicked",Toast.LENGTH_SHORT).show();
 
 
+                }
 
+                if(string .equals("next"))
+                {
 
+                    if (count < list.size()) {
+                        basePause();
+
+                        song = list.get(count = count + 5);
+                        idsong = song.getId();
+                        strin = song.getTitle();
+                        textView.setText(strin);
+
+                        mBoundService.play(idsong);
+                    }
+                }
+
+                if(string.equals("play"))
+                {
+
+                    if (isplaYing()) {
+                        basePause();
+
+                    }
+                    else
+                        baseResume();
+                }
+                if(string.equals("stop"))
+                {
+                    Toast.makeText(context,"Stop Clicked",Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        }
 
 }
-
