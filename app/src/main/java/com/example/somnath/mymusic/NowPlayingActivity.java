@@ -1,52 +1,53 @@
-package com.example.somnath.mymusic;
 
-import android.Manifest;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.media.Image;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.provider.MediaStore;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
+        package com.example.somnath.mymusic;
 
-import com.squareup.picasso.Picasso;
+        import android.Manifest;
+        import android.app.NotificationManager;
+        import android.app.PendingIntent;
+        import android.content.BroadcastReceiver;
+        import android.content.ComponentName;
+        import android.content.ContentResolver;
+        import android.content.Context;
+        import android.content.Intent;
+        import android.content.IntentFilter;
+        import android.content.ServiceConnection;
+        import android.content.SharedPreferences;
+        import android.content.pm.PackageManager;
+        import android.database.Cursor;
+        import android.media.Image;
+        import android.media.MediaPlayer;
+        import android.net.Uri;
+        import android.os.AsyncTask;
+        import android.os.Bundle;
+        import android.os.Handler;
+        import android.os.IBinder;
+        import android.provider.MediaStore;
+        import android.support.v4.app.NotificationCompat;
+        import android.support.v7.app.AppCompatActivity;
+        import android.util.Log;
+        import android.view.View;
+        import android.view.animation.Animation;
+        import android.view.animation.TranslateAnimation;
+        import android.widget.Button;
+        import android.widget.CheckBox;
+        import android.widget.EditText;
+        import android.widget.ImageButton;
+        import android.widget.ImageView;
+        import android.widget.LinearLayout;
+        import android.widget.RelativeLayout;
+        import android.widget.RemoteViews;
+        import android.widget.SeekBar;
+        import android.widget.TextView;
+        import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+        import com.squareup.picasso.Picasso;
+
+        import java.util.ArrayList;
+        import java.util.Timer;
+        import java.util.TimerTask;
+        import java.util.concurrent.Executors;
+        import java.util.concurrent.ScheduledExecutorService;
+        import java.util.concurrent.TimeUnit;
 
 
 
@@ -73,7 +74,7 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
 
         doBindService();
 
-       textView = (TextView) findViewById(R.id.nameofsong);
+        textView = (TextView) findViewById(R.id.nameofsong);
 
         ImageView imageView = (ImageView) findViewById(R.id.largeimage);
 
@@ -251,7 +252,7 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
 
         if(fromUser){
 
-              mBoundService.seeking(progress);
+            mBoundService.seeking(mBoundService.postion()+progress);
         }
 
         final long Minutes=((progress/1000)/60);
@@ -273,12 +274,14 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
     {
         super.onStart();
 
-        seekBar1.setProgress(20);
 
         try
         {
-            if(mBoundService!=null)
-               mBoundService.play(idsong);
+            if(mBoundService!=null&&!isplaYing())
+            {
+                mBoundService.play(idsong);
+
+            }
 
         }
         catch(Exception e)
@@ -325,7 +328,7 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
     }
 
 
-      private static void basePause()
+    private static void basePause()
     {
         try
         {
@@ -403,13 +406,13 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
     }
 
 
-        private void getSongList() {
+    private void getSongList() {
 
         ContentResolver musicResolver =getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
-            if (musicCursor != null && musicCursor.moveToFirst()) {
+        if (musicCursor != null && musicCursor.moveToFirst()) {
 
             //get columns
             int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
@@ -463,7 +466,7 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
                 .setContentTitle("Now Playing")
                 // Set Ticker Message
                 // Dismiss Notification
-                .setAutoCancel(false)
+                .setAutoCancel(true)
                 // Set PendingIntent into Notification
                 .setContentIntent(pIntent)
                 // Set RemoteViews into Notification
@@ -509,52 +512,53 @@ public class NowPlayingActivity extends AppCompatActivity implements SeekBar.OnS
 
 
 
-        public static class NotificationListener extends BroadcastReceiver {
+    public static class NotificationListener extends BroadcastReceiver {
 
-            @Override
-            public void onReceive(Context context, Intent intent)
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            String string=intent.getAction();
+
+            if(string.equals("previous"))
             {
-                String string=intent.getAction();
 
-                if(string.equals("previous")){
+                Toast.makeText(context,"Previous Clicked",Toast.LENGTH_SHORT).show();
 
-                    Toast.makeText(context,"Previous Clicked",Toast.LENGTH_SHORT).show();
-
-
-                }
-
-                if(string .equals("next"))
-                {
-
-                    if (count < list.size()) {
-                        basePause();
-
-                        song = list.get(count = count + 5);
-                        idsong = song.getId();
-                        strin = song.getTitle();
-                        textView.setText(strin);
-
-                        mBoundService.play(idsong);
-                    }
-                }
-
-                if(string.equals("play"))
-                {
-
-                    if (isplaYing()) {
-                        basePause();
-
-                    }
-                    else
-                        baseResume();
-                }
-                if(string.equals("stop"))
-                {
-                    Toast.makeText(context,"Stop Clicked",Toast.LENGTH_SHORT).show();
-
-                }
 
             }
+
+            if(string .equals("next"))
+            {
+
+                if (count < list.size()) {
+                    basePause();
+
+                    song = list.get(count = count + 5);
+                    idsong = song.getId();
+                    strin = song.getTitle();
+                    textView.setText(strin);
+
+                    mBoundService.play(idsong);
+                }
+            }
+
+            if(string.equals("play"))
+            {
+
+                if (isplaYing()) {
+                    basePause();
+
+                }
+                else
+                    baseResume();
+            }
+            if(string.equals("stop"))
+            {
+                Toast.makeText(context,"Stop Clicked",Toast.LENGTH_SHORT).show();
+
+            }
+
         }
+    }
 
 }

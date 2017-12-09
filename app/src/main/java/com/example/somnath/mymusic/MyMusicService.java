@@ -171,7 +171,6 @@ public class MyMusicService extends Service implements MediaPlayer.OnCompletionL
     public void seeking(int arg)
     {
         player.pause();
-
       player.seekTo(arg);
         resume();
     }
