@@ -12,6 +12,7 @@ public class Song {
     private String a_lbums;
     private String genre_s;
     private String albumart;
+    private int Dduration;
 
 
     public Song(long id, String artist,String songTitle,String albums,String genres) {
@@ -21,6 +22,16 @@ public class Song {
         a_lbums=albums;
         genre_s=genres;
     }
+    public Song(long id,String titl,int duration)
+    {Id=id;
+        title=titl;
+        Dduration=duration;
+    }
+    public  Song (long id ,String titl)
+    {
+        Id=id;
+        title=titl;
+    }
 
     public Song(String namealbum,String artists,String albumimage) {
         a_lbums=namealbum;
@@ -28,6 +39,7 @@ public class Song {
         Artist=artists;
 
     }
+
     public Song(long id, String artist,String songTitle,String albums,String genres,String albumimage) {
         Id =id;
         title=songTitle;
@@ -45,6 +57,7 @@ public class Song {
     public long getId(){return Id;}
     public String getGenres(){return genre_s;}
     public  String getAlbumart(){return  albumart;}
+    public  int getDduration(){return Dduration;}
 
 
 }

@@ -2,19 +2,28 @@ package com.example.somnath.mymusic;
 
 import android.Manifest;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.somnath.mymusic.adapters.SongAdapter;
 
@@ -28,6 +37,41 @@ public class AllSongsFragment extends Fragment {
 
     private ArrayList<Song> songList;
     private ListView list;
+    private MyMusicService mBoundService;
+    private SongsPosition receiver;
+    private Context context;
+
+    //mconnection
+    private ServiceConnection mConnection = new ServiceConnection()
+    {
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {  mBoundService = ((MyMusicService.LocalBinder) service).getService();
+        }
+
+        public void onServiceDisconnected(ComponentName className)
+        {
+
+        }
+    };
+
+    @Override
+    public void onCreate(Bundle s)
+    {
+        super.onCreate(s);
+        context=getContext();
+
+        Intent playerServiceIntent = new Intent(getContext(), MyMusicService.class);
+        getActivity().bindService(playerServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
+
+
+
+        IntentFilter filter = new IntentFilter("pos");
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver=new SongsPosition();
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver,filter);
+
+        Toast.makeText(context,"onCreate",Toast.LENGTH_SHORT).show();
+    }
 
 
     @Override
@@ -41,13 +85,11 @@ public class AllSongsFragment extends Fragment {
                 // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
                 // app-defined int constant
                 return v;
-            }}
-
+            }
+        }
 
         list=(ListView)v. findViewById(R.id.list_item);
         songList = new ArrayList<Song>();
-
-
 
         getSongList();
 
@@ -62,9 +104,29 @@ public class AllSongsFragment extends Fragment {
         list.setAdapter(songAdt);
 
 
+        Toast.makeText(context,"onCreateView",Toast.LENGTH_SHORT).show();
+
         return v;
     }
 
+    @Override
+    public  void onResume()
+    {
+        super.onResume();
+        Toast.makeText(context,"onResume",Toast.LENGTH_SHORT).show();
+
+
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        Toast.makeText(context,"onPause",Toast.LENGTH_SHORT).show();
+
+
+
+    }
 
 
 
@@ -76,13 +138,12 @@ public class AllSongsFragment extends Fragment {
           Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
           if (musicCursor != null && musicCursor.moveToFirst()) {
-//get columns
-             int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+              //get columns
+              int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
               int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
               int titleArtist=musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
               int titleAlbums=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
               int titleGenres =musicCursor.getColumnIndex(MediaStore.Audio.Genres._ID);
-
 
               //add songs to list
               do {
@@ -95,13 +156,42 @@ public class AllSongsFragment extends Fragment {
                   songList.add(new Song(id,thisartist,thisTitle,thisAlbums,this_genres));
                 }
 
-              while (musicCursor.moveToNext());
+               while (musicCursor.moveToNext());
           }
 
           if(musicCursor!=null)
           {
               musicCursor.close();
           }
+    }
+
+    public  class SongsPosition extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            int songposition=intent.getIntExtra("posit",0);
+            mBoundService.storeTracklist(songList);
+
+            Toast.makeText(context,"Hello",Toast.LENGTH_SHORT).show();
+            Toast.makeText(context,"klhjibop",Toast.LENGTH_SHORT).show();
+
+
+            mBoundService.play(songposition);
+
+        }
+    }
+
+    @Override
+    public  void  onDestroy()
+    {
+        super.onDestroy();
+        getActivity().unbindService(mConnection);
+        Toast.makeText(context,"onDestroy",Toast.LENGTH_SHORT).show();
+
+        LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
+
+
     }
 
 }

@@ -29,6 +29,7 @@
         <activity
             android:name=".NowPlayingActivity"
             android:label="Now Playing"
+               android:parentActivityName=".MainActivity"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -121,9 +122,12 @@
                 <action android:name="next"/>
                 <action android:name="play"/>
                 <action android:name="stop"/>
-                </intent-filter>
+            </intent-filter>
 
         </receiver>
+
+
+
 
 
 

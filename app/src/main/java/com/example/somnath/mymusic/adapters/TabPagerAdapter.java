@@ -12,7 +12,7 @@ import com.example.somnath.mymusic.ArtistsFragment;
 public class TabPagerAdapter extends FragmentStatePagerAdapter {
 
     //integer to count number of tabs
-   private int tabCount;
+    private int tabCount;
 
     //Constructor to the class
     public TabPagerAdapter(FragmentManager fm, int tabCount) {
@@ -30,13 +30,13 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
         switch (position)
         {
             case 0:
-                 fragment= new AllSongsFragment();
+                fragment= new AllSongsFragment();
                 break;
             case 1:
                 fragment= new AlbumsFragment();
                 break;
             case 2:
-                fragment= new ArtistsFragment();
+                fragment= new AllSongsFragment();
                 break;
             case 3:
                 fragment= new AllSongsFragment();
@@ -44,7 +44,6 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
             case 4:
                 fragment= new AllSongsFragment();
                 break;
-
         }
         return fragment;
 

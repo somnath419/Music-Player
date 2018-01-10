@@ -1,100 +1,181 @@
 package com.example.somnath.mymusic;
 
-import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Binder;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.Toast;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.example.somnath.mymusic.NowPlayingActivity.count;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.net.Uri;
+import android.os.Binder;
+import android.os.IBinder;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Audio;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+import android.widget.RemoteViews;
+import android.widget.Toast;
 
+public class MyMusicService extends Service {
 
-public class MyMusicService extends Service implements MediaPlayer.OnCompletionListener,MediaPlayer.OnPreparedListener
+    static public final int STOPED = -1, PAUSED = 0, PLAYING = 1;
+    private MediaPlayer mediaPlayer;
+    private ArrayList<Song> tracklist;
+    private int status, currentTrackPosition;
+    private boolean taken;
+    private IBinder playerBinder;
+    private Context context;
 
-{
-    // This is the object that receives interactions from clients. See RemoteService for a more complete example.
-    private final IBinder mBinder = new LocalBinder();
-    private MediaPlayer player;
-    private  Context context;
-    private MediaPlayer.OnCompletionListener onCompletionListener;
-    private boolean complete=false;
-    private ArrayList<Song> list;
-    private  Song song;
-    private NowPlayingActivity nowPlayingActivity;
-    private  long idsong,idsong2;
-
-
-    /**
-     * Class for clients to access. Because we know this service always runs in
-     * the same process as its clients, we don't need to deal with IPC.
-     */
     public class LocalBinder extends Binder
     {
-        MyMusicService getService()
-        {
+        public MyMusicService getService() {
+
             return MyMusicService.this;
         }
     }
 
-    @Override
-    public void onCreate()
-    {
-
-    }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
-        // We want this service to continue running until it is explicitly stopped, so return sticky.
-        player=new MediaPlayer();
-        player.setOnCompletionListener(this);
+    public void onCreate() {
 
+        super.onCreate();
+        context=this;
 
+        mediaPlayer = new MediaPlayer();
+        tracklist = new ArrayList<Song>();
+        currentTrackPosition = -1;
+        setStatus(STOPED);
+        playerBinder = new LocalBinder();
 
+        mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
 
+            @Override
+            public void onCompletion(MediaPlayer arg0) {
+                if (currentTrackPosition == tracklist.size()-1) {
+                    stop();
+                } else {
+                    nextTrack();
+                }
+            }
+        });
 
+        restoreTracklist();
 
-
-        return START_STICKY;
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        destroy();
     }
 
     @Override
     public IBinder onBind(Intent intent)
     {
-        return mBinder;
+        CustomNotification();
+
+        return playerBinder;
+
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent)
+    {
+        return super.onUnbind(intent);
+    }
+
+    public void take() {
+        taken = true;
+    }
+
+    private void untake() {
+        synchronized (this) {
+            taken = false;
+            notifyAll();
+        }
+    }
+
+    public boolean isTaken() {
+        return taken;
+    }
+
+    private void setStatus(int s) {
+        status = s;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public ArrayList<Song> getTracklist() {
+        return tracklist;
+    }
+
+    public Song getTrack(int pos) {
+        return tracklist.get(pos);
+    }
+
+    public void addTrack(Song track) {
+        tracklist.add(track);
+        untake();
+    }
+
+    public void addTrack(long id,String name) {
+        tracklist.add(new Song(id,name));
+        untake();
+    }
+
+    public Song getCurrentTrack() {
+        if (currentTrackPosition < 0) {
+            return null;
+        } else {
+            return tracklist.get(currentTrackPosition);
+        }
+    }
+
+    public int getCurrentTrackPosition() {
+        return currentTrackPosition;
     }
 
 
-    public void play(long res)
-    {
-        player.reset();
-        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, res);
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+    public void removeTrack(int pos) {
+        if (pos == currentTrackPosition) {
+            stop();
+        }
+        if (pos < currentTrackPosition) {
+            currentTrackPosition--;
+        }
+        tracklist.remove(pos);
+        untake();
+    }
+
+    public void clearTracklist() {
+        if (status > STOPED) {
+            stop();
+        }
+        tracklist.clear();
+        untake();
+    }
+
+    public void playTrack(int pos) {
+        if (status > STOPED) {
+            stop();
+        }
+        Song song=tracklist.get(pos);
+        long id =song.getId();
+
+        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,id );
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try
         {
-            player.setDataSource(getApplicationContext(), trackUri);
+            mediaPlayer.setDataSource(getApplicationContext(), trackUri);
         }
         catch (Exception e)
         {
@@ -102,153 +183,184 @@ public class MyMusicService extends Service implements MediaPlayer.OnCompletionL
         }
         try
         {
-            player.prepare();
+            mediaPlayer.prepare();
         }
         catch (Exception e)
         {                Log.e("MUSIC SERVICE", "Error Setting Data Source", e);
 
         }
-        player.start();
+        mediaPlayer.start();
+
+        currentTrackPosition = pos;
+        setStatus(PLAYING);
+        untake();
     }
 
+    public void play(int pos) {
+        playTrack(pos);
+    }
 
-    public void pause()
-    {
-        if(null != player && player.isPlaying())
-        {
-            player.pause();
-            player.seekTo(player.getCurrentPosition());
+    public void play() {
+        switch (status) {
+            case STOPED:
+                if (!tracklist.isEmpty()) {
+                    playTrack(0);
+                }
+                break;
+            case PLAYING:
+                mediaPlayer.pause();
+                setStatus(PAUSED);
+                break;
+            case PAUSED:
+                mediaPlayer.start();
+                setStatus(PLAYING);
+                break;
+        }
+        untake();
+    }
+
+    public void pause() {
+        mediaPlayer.pause();
+        setStatus(PAUSED);
+        untake();
+    }
+
+    public void stop() {
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        currentTrackPosition = -1;
+        setStatus(STOPED);
+        untake();
+    }
+
+    public void nextTrack() {
+        if (currentTrackPosition < tracklist.size()-1) {
+            playTrack(currentTrackPosition+1);
         }
     }
 
-    public int postion()
-    {
-       return player.getCurrentPosition();
-    }
-
-    public int totalduration()
-    {
-        return player.getDuration();
-    }
-
-    public void resume()
-    {
-        try
-        {
-            if(player !=null && !player.isPlaying())
-            {
-                player.start();
-            }
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
+    public void prevTrack() {
+        if (currentTrackPosition > 0) {
+            playTrack(currentTrackPosition-1);
         }
     }
 
-
-    public void destroy()
-    {
-        if(null != player)
-        {
-            if(player.isPlaying())
-            {
-                player.stop();
-            }
-
-            player.release();
-            player = null;
+    public int getCurrentTrackProgress() {
+        if (status > STOPED) {
+            return mediaPlayer.getCurrentPosition();
+        } else {
+            return 0;
         }
     }
 
-    //return isplaying
-
-    public  boolean isplaying()
-    {
-        return player.isPlaying();
+    public int getCurrentTrackDuration() {
+        if (status > STOPED) {
+            return tracklist.get(currentTrackPosition).getDduration();
+        } else {
+            return 0;
+        }
     }
 
-    public void seeking(int arg)
-    {
-        player.pause();
-      player.seekTo(arg);
-        resume();
+    public void seekTrack(int p) {
+        if (status > STOPED) {
+            mediaPlayer.seekTo(p);
+            untake();
+        }
     }
 
+    public void storeTracklist(ArrayList<Song> tracklist) {
+        DbNowplaying dbOpenHelper = new DbNowplaying(getApplicationContext());
+        SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
+        dbOpenHelper.onUpgrade(db, 1, 1);
+        for (int i = 0; i < tracklist.size(); i++) {
+            ContentValues c = new ContentValues();
+            Song pos=tracklist.get(i);
+            long id_song=pos.getId();
+            c.put(DbNowplaying.KEY_POSITION,id_song);
+            c.put(DbNowplaying.KEY_FILE, tracklist.get(i).getTitle());
+            db.insert(DbNowplaying.TABLE_NAME, null, c);
+        }
+        dbOpenHelper.close();
+    }
+
+    public void restoreTracklist() {
+        DbNowplaying dbOpenHelper = new DbNowplaying(getApplicationContext());
+        SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
+        Cursor c = db.query(DbNowplaying.TABLE_NAME, null, null, null, null, null, null);
+        tracklist.clear();
+        while (c.moveToNext()) {
+            tracklist.add(new Song(c.getLong(0),c.getString(1)));
+        }
+        dbOpenHelper.close();
+    }
+
+
+    public void CustomNotification() {
+
+        // Using RemoteViews to bind custom layouts into Notification
+        RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_view);
+        // Open NotificationView Class on Notification Click
+        Intent intent = new Intent(this,MainActivity.class);
+
+        // Open NotificationView.java Activity
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                // Set Icon
+                .setSmallIcon(R.drawable.play)
+                .setContentTitle("Now Playing")
+                // Set Ticker Message
+                // Dismiss Notification
+                .setAutoCancel(false)
+                // Set PendingIntent into Notification
+                .setContentIntent(pIntent)
+                // Set RemoteViews into Notification
+                .setContent(remoteViews);
+
+
+        Intent previousclick = new Intent("previous");
+        previousclick.putExtra("previous",1);
+
+        Intent nextclick = new Intent("next");
+        nextclick.putExtra("extra", "hello");
+
+        Intent play_pause = new Intent("play");
+        play_pause.putExtra("play",3);
+
+        Intent stop = new Intent("stop");
+        stop.putExtra("stop",4);
+
+
+        PendingIntent pre = PendingIntent.getBroadcast(this, 0,previousclick, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent next = PendingIntent.getBroadcast(this,0,nextclick, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent playPause = PendingIntent.getBroadcast(this,0,play_pause, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent  Stop = PendingIntent.getBroadcast(this,0,stop,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        remoteViews.setOnClickPendingIntent(R.id.previous_not,pre);
+        remoteViews.setOnClickPendingIntent(R.id.playPause_not,playPause);
+        remoteViews.setOnClickPendingIntent(R.id.next_not,next);
+        remoteViews.setOnClickPendingIntent(R.id.stop_not,Stop);
+
+
+
+        // Create Notification Manager
+        NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        // Build Notification with Notification Manager
+        notificationmanager.notify(0, builder.build());
+
+    }
 
     @Override
-    public void onPrepared(MediaPlayer mp) {
+    public void onDestroy()
+    { super.onDestroy();
 
     }
 
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-          Toast.makeText(this,"Songs completed",Toast.LENGTH_SHORT).show();
 
 
 
-        list=new ArrayList<Song>();
 
-        getSongList();
-
-        song=list.get(count=count+3);
-        idsong=song.getId();
-
-        player.stop();
-        player.reset();
-
-        play(idsong);
-
-
-    }
-
-    public void OnNewSong()
-    {
-        player.stop();
-        player.reset();
-    }
-
-
-    public  MediaPlayer mediaPlayer()
-    {return player;}
-
-
-    public void getSongList() {
-
-        ContentResolver musicResolver =getContentResolver();
-        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-
-            //get columns
-            int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int titleArtist=musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int titleAlbums=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
-            int titleGenres =musicCursor.getColumnIndex(MediaStore.Audio.Genres._ID);
-
-
-            //add songs to list
-            do {
-                String thisTitle = musicCursor.getString(titleColumn);
-                long id= musicCursor.getInt(idColumn);
-                String thisartist=musicCursor.getString(titleArtist);
-                String thisAlbums=musicCursor.getString(titleAlbums);
-                String this_genres=musicCursor.getString(titleGenres);
-
-                list.add(new Song(id,thisartist,thisTitle,thisAlbums,this_genres));
-            }
-
-            while (musicCursor.moveToNext());
-        }
-
-        if(musicCursor!=null)
-        {
-            musicCursor.close();
-        }
-    }
 
 
 }
-

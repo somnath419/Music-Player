@@ -1,10 +1,14 @@
 package com.example.somnath.mymusic;
 
 import android.app.ListActivity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -33,9 +37,24 @@ public class MainActivity extends AppCompatActivity
     private TabLayout tabLayout;
     private  Menu menu;
     private  NavigationView navigationView;
+    private  MyMusicService mBoundService;
 
     //This is our viewPager
-    private ViewPager viewPager;
+    private ViewPager viewPager;  //mconnection
+    private ServiceConnection mConnection = new ServiceConnection()
+    {
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {  mBoundService = ((MyMusicService.LocalBinder) service).getService();
+        }
+
+        public void onServiceDisconnected(ComponentName className)
+        {
+
+        }
+    };
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +99,8 @@ public class MainActivity extends AppCompatActivity
          navigationView =(NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
+        Intent playerServiceIntent = new Intent(this, MyMusicService.class);
+        bindService(playerServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
 
     }
 
@@ -101,7 +120,13 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
+   @Override
+   public  void onStart()
+   {
+       super.onStart();
+       Intent intent=new Intent(this,MyMusicService.class);
+       startService(intent);
+   }
 
 
 
@@ -110,6 +135,8 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
     }
+
+
     @Override
     public void onPause() {
         super.onPause();
@@ -191,5 +218,14 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        stopService(new Intent(this,MyMusicService.class));
+    }
+
 
 }

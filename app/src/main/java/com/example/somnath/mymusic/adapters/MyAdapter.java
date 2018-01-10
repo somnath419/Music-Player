@@ -106,11 +106,9 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     Song currSong = listSong.get(position);
                     viewHolder0.mTextView.setText(currSong.getAlbums());
                     viewHolder0.mTextView2.setText(currSong.getArtist());
-
-
                     Bitmap bm= BitmapFactory.decodeFile(currSong.getAlbumart());
-
                     viewHolder0.imageView.setImageBitmap(bm);
+
 
                     break;
 

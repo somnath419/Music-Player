@@ -1,8 +1,12 @@
 package com.example.somnath.mymusic.adapters;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +14,13 @@ import android.widget.BaseAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.somnath.mymusic.AllSongsFragment;
+import com.example.somnath.mymusic.MyMusicService;
 import com.example.somnath.mymusic.NowPlayingActivity;
 import com.example.somnath.mymusic.R;
 import com.example.somnath.mymusic.Song;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 
 
@@ -25,6 +32,8 @@ public class SongAdapter extends BaseAdapter {
     private ArrayList<Song> songs;
     private LayoutInflater songInf;
     private Context context;
+    private MyMusicService mBoundService;
+     private  ServiceConnection serviceConnection;
 
 
 
@@ -33,10 +42,9 @@ public class SongAdapter extends BaseAdapter {
         songInf = LayoutInflater.from(c);
         context = c;
 
+
+
     }
-
-
-
 
     @Override
     public int getCount() {
@@ -73,27 +81,16 @@ public class SongAdapter extends BaseAdapter {
         songLay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Song currSong = songs.get(position);
-                long id = currSong.getId();
-                String strin = currSong.getTitle();
 
 
+                Intent broadcastIntent = new Intent();
+                broadcastIntent.setAction("pos");
+                broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+                broadcastIntent.putExtra("posit",position);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(broadcastIntent);
 
-                Intent intent1 = new Intent(v.getContext(), NowPlayingActivity.class);
-
-                Bundle bun = new Bundle();
-                bun.putLong("song_id",id);
-                bun.putString("song_string",strin);
-
-                intent1.putExtras(bun);
-                intent1.putExtra("f",1);
-
-                v.getContext().startActivity(intent1);
-
-
-
-
-
+                Intent intent=new Intent(context,NowPlayingActivity.class);
+                context.startActivity(intent);
             }
         });
 

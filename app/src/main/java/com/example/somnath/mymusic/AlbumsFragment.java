@@ -75,8 +75,6 @@ public class AlbumsFragment extends Fragment {
 
         recyclerView1.setAdapter(mAdapter1);
 
-
-
         return v;
     }
 
