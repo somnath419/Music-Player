@@ -22,6 +22,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -50,7 +51,6 @@ public class AllSongsFragment extends Fragment {
 
         public void onServiceDisconnected(ComponentName className)
         {
-
         }
     };
 
@@ -62,8 +62,6 @@ public class AllSongsFragment extends Fragment {
 
         Intent playerServiceIntent = new Intent(getContext(), MyMusicService.class);
         getActivity().bindService(playerServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
-
-
 
         IntentFilter filter = new IntentFilter("pos");
         filter.addCategory(Intent.CATEGORY_DEFAULT);
@@ -93,7 +91,6 @@ public class AllSongsFragment extends Fragment {
 
         getSongList();
 
-
         Collections.sort(songList, new Comparator<Song>(){
             public int compare(Song a, Song b){
                 return a.getTitle().compareTo(b.getTitle());
@@ -102,7 +99,6 @@ public class AllSongsFragment extends Fragment {
 
         SongAdapter songAdt = new SongAdapter(getContext(),songList);
         list.setAdapter(songAdt);
-
 
         Toast.makeText(context,"onCreateView",Toast.LENGTH_SHORT).show();
 
@@ -114,23 +110,15 @@ public class AllSongsFragment extends Fragment {
     {
         super.onResume();
         Toast.makeText(context,"onResume",Toast.LENGTH_SHORT).show();
-
-
     }
 
     @Override
     public void onPause()
     {
         super.onPause();
+
         Toast.makeText(context,"onPause",Toast.LENGTH_SHORT).show();
-
-
-
     }
-
-
-
-
 
     public void getSongList() {
           ContentResolver musicResolver = getActivity().getContentResolver();
@@ -138,6 +126,7 @@ public class AllSongsFragment extends Fragment {
           Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
           if (musicCursor != null && musicCursor.moveToFirst()) {
+
               //get columns
               int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
               int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
@@ -155,10 +144,8 @@ public class AllSongsFragment extends Fragment {
 
                   songList.add(new Song(id,thisartist,thisTitle,thisAlbums,this_genres));
                 }
-
-               while (musicCursor.moveToNext());
+              while (musicCursor.moveToNext());
           }
-
           if(musicCursor!=null)
           {
               musicCursor.close();
@@ -169,28 +156,20 @@ public class AllSongsFragment extends Fragment {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
             int songposition=intent.getIntExtra("posit",0);
             mBoundService.storeTracklist(songList);
 
             Toast.makeText(context,"Hello",Toast.LENGTH_SHORT).show();
             Toast.makeText(context,"klhjibop",Toast.LENGTH_SHORT).show();
-
-
             mBoundService.play(songposition);
-
         }
     }
 
     @Override
     public  void  onDestroy()
-    {
-        super.onDestroy();
-        getActivity().unbindService(mConnection);
+    {   super.onDestroy();
         Toast.makeText(context,"onDestroy",Toast.LENGTH_SHORT).show();
-
         LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
-
 
     }
 

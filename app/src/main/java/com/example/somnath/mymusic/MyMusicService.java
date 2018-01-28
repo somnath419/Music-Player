@@ -40,8 +40,7 @@ public class MyMusicService extends Service {
     private Context context;
 
     public class LocalBinder extends Binder
-    {
-        public MyMusicService getService() {
+    {    public MyMusicService getService() {
 
             return MyMusicService.this;
         }
@@ -132,11 +131,11 @@ public class MyMusicService extends Service {
         untake();
     }
 
-    public Song getCurrentTrack() {
+    public String getCurrentTrack() {
         if (currentTrackPosition < 0) {
             return null;
         } else {
-            return tracklist.get(currentTrackPosition);
+            return tracklist.get(currentTrackPosition).getTitle();
         }
     }
 
@@ -274,9 +273,7 @@ public class MyMusicService extends Service {
         dbOpenHelper.onUpgrade(db, 1, 1);
         for (int i = 0; i < tracklist.size(); i++) {
             ContentValues c = new ContentValues();
-            Song pos=tracklist.get(i);
-            long id_song=pos.getId();
-            c.put(DbNowplaying.KEY_POSITION,id_song);
+            c.put(DbNowplaying.KEY_POSITION,tracklist.get(i).getTitle());
             c.put(DbNowplaying.KEY_FILE, tracklist.get(i).getTitle());
             db.insert(DbNowplaying.TABLE_NAME, null, c);
         }
@@ -293,6 +290,8 @@ public class MyMusicService extends Service {
         }
         dbOpenHelper.close();
     }
+
+
 
 
     public void CustomNotification() {
@@ -347,7 +346,7 @@ public class MyMusicService extends Service {
         // Create Notification Manager
         NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         // Build Notification with Notification Manager
-        notificationmanager.notify(0, builder.build());
+        startForeground(1337,builder.build());
 
     }
 

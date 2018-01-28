@@ -82,7 +82,6 @@ public class SongAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-
                 Intent broadcastIntent = new Intent();
                 broadcastIntent.setAction("pos");
                 broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

@@ -38,28 +38,26 @@ public class MainActivity extends AppCompatActivity
     private  Menu menu;
     private  NavigationView navigationView;
     private  MyMusicService mBoundService;
+    private Context context;
 
     //This is our viewPager
     private ViewPager viewPager;  //mconnection
+
     private ServiceConnection mConnection = new ServiceConnection()
     {
         public void onServiceConnected(ComponentName className, IBinder service)
         {  mBoundService = ((MyMusicService.LocalBinder) service).getService();
         }
-
         public void onServiceDisconnected(ComponentName className)
         {
-
         }
     };
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context=this;
 
         //Adding toolbar to the activity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -74,33 +72,32 @@ public class MainActivity extends AppCompatActivity
         //Initializing the tablayout
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
+        View view=(View )findViewById(R.id.viewnowPlaying);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(context,NowPlayingActivity.class));
+            }
+        });
+
         //Adding the tabs using addTab() method
         tabLayout.addTab(tabLayout.newTab().setText("Songs"));
         tabLayout.addTab(tabLayout.newTab().setText("Albums"));
         tabLayout.addTab(tabLayout.newTab().setText("Artists"));
         tabLayout.addTab(tabLayout.newTab().setText("Genres"));
         tabLayout.addTab(tabLayout.newTab().setText("Playlists"));
-
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
-        //Initializing viewPager
         viewPager = (ViewPager) findViewById(R.id.pager);
 
-        //Creating our pager adapter
         TabPagerAdapter adapter = new TabPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-
-        //Adding adapter to pager
         viewPager.setAdapter(adapter);
-
-        //Adding onTabSelectedListener to swipe views
         tabLayout.setOnTabSelectedListener(this);
-
-
-         navigationView =(NavigationView) findViewById(R.id.nav_view);
+        navigationView =(NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Intent playerServiceIntent = new Intent(this, MyMusicService.class);
-        bindService(playerServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
+        //service started
+        startService(new Intent(context,MyMusicService.class));
 
     }
 
@@ -111,21 +108,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-
     }
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-
     }
 
-
-   @Override
+    @Override
    public  void onStart()
-   {
-       super.onStart();
-       Intent intent=new Intent(this,MyMusicService.class);
-       startService(intent);
+   {  super.onStart();
+
    }
 
 
@@ -160,10 +152,6 @@ public class MainActivity extends AppCompatActivity
 
         return true;
     }
-
-
-
-
 
 
 
@@ -224,7 +212,8 @@ public class MainActivity extends AppCompatActivity
     public void onDestroy()
     {
         super.onDestroy();
-        stopService(new Intent(this,MyMusicService.class));
+        //service stopped
+        stopService(new Intent(context,MyMusicService.class));
     }
 
 

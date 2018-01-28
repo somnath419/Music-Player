@@ -10,15 +10,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,28 +35,26 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 
 public class NowPlayingActivity extends AppCompatActivity
+
 {
     private Context context;
     private  static MyMusicService mBoundService;
     private boolean mIsBound = false;
-    private static long idsong;
     private static String strin;
-    private ArrayList<Song> list;
-    private static Song song;
-    public static int count=0;
+    private Song song;
     private SeekBar seekBar1;
     private  TextView textView;
     boolean userTouch;
     private  ImageButton play_pause;
+    private ArrayList<Song> arrayList;
+    private ArrayList<String> arrayList1;
 
     //mconnection
     private  ServiceConnection mConnection = new ServiceConnection()
     {
         public void onServiceConnected(ComponentName className, IBinder service)
         {  mBoundService = ((MyMusicService.LocalBinder) service).getService();
-
         }
-
         public void onServiceDisconnected(ComponentName className)
         {
 
@@ -65,33 +66,41 @@ public class NowPlayingActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nowplaying_activity);
-
-
+        context = this;
         doBindService();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        textView = (TextView) findViewById(R.id.nameofsong);
+        play_pause = (ImageButton) findViewById(R.id.play);
 
-         play_pause = (ImageButton) findViewById(R.id.play);
-        ImageButton stop = (ImageButton) findViewById(R.id.stop);
         ImageButton nextt = (ImageButton) findViewById(R.id.nex33t);
+
         final ImageButton pause = (ImageButton) findViewById(R.id.pause);
         ImageButton previous = (ImageButton) findViewById(R.id.previous);
         ImageButton next = (ImageButton) findViewById(R.id.next);
 
-        stop.setOnClickListener(new View.OnClickListener() {
+        Button nowPlayingList=(Button) findViewById(R.id.nowPlayinglist);
+        nowPlayingList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mBoundService.restoreTracklist();
+
+                arrayList=mBoundService.getTracklist();
+                arrayList1=new ArrayList<String>();
+
+                for(int i=0;i<arrayList.size();i++)
+                   arrayList1.add(arrayList.get(i).getTitle());
+
+
+
+
+                PlayingListFragment playingListFragment=new PlayingListFragment();
+                Bundle args = new Bundle();
+                args.putSerializable("index", arrayList);
+                playingListFragment.setArguments(args);
+
+                getFragmentManager().beginTransaction().replace(R.id.song_list,playingListFragment).commit();
             }
         });
-
-
-        context = this;
-        list = new ArrayList<Song>();
-        getSongList();
-
 
         //play or pause button
         play_pause.setOnClickListener(new View.OnClickListener() {
@@ -118,6 +127,7 @@ public class NowPlayingActivity extends AppCompatActivity
             @Override
             public void onClick(View v){
                 mBoundService.nextTrack();
+
             }
         });
 
@@ -128,17 +138,23 @@ public class NowPlayingActivity extends AppCompatActivity
                mBoundService.prevTrack();
             }
         });
-
-
-
     }
-
-
 
     @Override
     protected void onStart()
     {   super.onStart();
+
+    }
+
+    @Override
+    protected void onResume()
+    {   super.onResume();
         play_pause.setVisibility(View.GONE);
+
+
+String string=mBoundService.getCurrentTrack();
+textView.setText(string);
+
     }
 
     @Override
@@ -153,15 +169,8 @@ public class NowPlayingActivity extends AppCompatActivity
         super.onStop();
     }
 
-
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-    }
-
-    private  void doBindService()
-    {  Intent i = new Intent(getApplicationContext(), MyMusicService.class);
+    private void doBindService()
+    {   Intent i = new Intent(getApplicationContext(), MyMusicService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
     }
@@ -179,47 +188,6 @@ public class NowPlayingActivity extends AppCompatActivity
     protected void onDestroy()
     {super.onDestroy();
     }
-
-
-    private void getSongList() {
-        ContentResolver musicResolver = getContentResolver();
-        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-
-
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-
-            //get columns
-            int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int titleArtist=musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int titleAlbums=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
-            int titleGenres =musicCursor.getColumnIndex(MediaStore.Audio.Genres._ID);
-
-
-            //add songs to list
-            do {
-                String thisTitle = musicCursor.getString(titleColumn);
-                long id= musicCursor.getInt(idColumn);
-                String thisartist=musicCursor.getString(titleArtist);
-                String thisAlbums=musicCursor.getString(titleAlbums);
-                String this_genres=musicCursor.getString(titleGenres);
-
-                list.add(new Song(id,thisartist,thisTitle,thisAlbums,this_genres));
-                }
-
-            while (musicCursor.moveToNext());
-        }
-
-        if(musicCursor!=null)
-        {
-            musicCursor.close();
-        }
-    }
-
-
-    // Custom Notification
-
 
     public static class NotificationListener extends BroadcastReceiver {
 
@@ -244,6 +212,7 @@ public class NowPlayingActivity extends AppCompatActivity
 
         }
     }
+
 
 
 }

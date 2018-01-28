@@ -36,7 +36,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 fragment= new AlbumsFragment();
                 break;
             case 2:
-                fragment= new AllSongsFragment();
+                fragment= new AlbumsFragment();
                 break;
             case 3:
                 fragment= new AllSongsFragment();

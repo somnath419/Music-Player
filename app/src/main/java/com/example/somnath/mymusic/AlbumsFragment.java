@@ -46,7 +46,7 @@ public class AlbumsFragment extends Fragment {
             {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
                     // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-                    // app-defined int constant
+                    // app-defined int constantee
                 return v;
             }}
 

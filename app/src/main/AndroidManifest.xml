@@ -108,7 +108,7 @@
 
         <service
             android:name=".MyMusicService"
-            android:enabled="true"
+            android:stopWithTask="true"
             >
 
 
