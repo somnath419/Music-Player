@@ -36,14 +36,10 @@ public class SongAdapter extends BaseAdapter {
      private  ServiceConnection serviceConnection;
 
 
-
     public SongAdapter(Context c, ArrayList<Song> theSongs) {
         songs = theSongs;
         songInf = LayoutInflater.from(c);
         context = c;
-
-
-
     }
 
     @Override

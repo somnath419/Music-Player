@@ -15,9 +15,10 @@ public class DbNowplaying extends SQLiteOpenHelper{
     public static final String DATABASE_NAME = "player";
     public static final String KEY_POSITION = "position";
     public static final String KEY_FILE = "file";
-    public static final String KEY_CURRENT="CURRENT";
     public static final String TABLE_NAME = "tracklist";
-    public static final String TABLE_CREATE = "CREATE TABLE "+TABLE_NAME+" ("+KEY_POSITION+" TEXT, "+KEY_FILE+" TEXT);";
+    public static final String TABLE_CREATE = "CREATE TABLE "+TABLE_NAME+"("+KEY_POSITION+" TEXT, "+KEY_FILE+" TEXT);";
+
+
 
     SQLiteDatabase database=null;
 

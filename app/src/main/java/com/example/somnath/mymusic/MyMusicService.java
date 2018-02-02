@@ -14,6 +14,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioManager;
@@ -34,10 +35,13 @@ public class MyMusicService extends Service {
     static public final int STOPED = -1, PAUSED = 0, PLAYING = 1;
     private MediaPlayer mediaPlayer;
     private ArrayList<Song> tracklist;
-    private int status, currentTrackPosition;
+    private int status;
+    private static int currentTrackPosition;
     private boolean taken;
     private IBinder playerBinder;
     private Context context;
+    SharedPreferences sharedpreferences;
+    public static final String MyPREFERENCES = "MyPrefs" ;
 
     public class LocalBinder extends Binder
     {    public MyMusicService getService() {
@@ -52,10 +56,10 @@ public class MyMusicService extends Service {
 
         super.onCreate();
         context=this;
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
         mediaPlayer = new MediaPlayer();
         tracklist = new ArrayList<Song>();
-        currentTrackPosition = -1;
         setStatus(STOPED);
         playerBinder = new LocalBinder();
 
@@ -77,11 +81,8 @@ public class MyMusicService extends Service {
 
     @Override
     public IBinder onBind(Intent intent)
-    {
-        CustomNotification();
-
+    {   CustomNotification();
         return playerBinder;
-
     }
 
     @Override
@@ -137,6 +138,11 @@ public class MyMusicService extends Service {
         } else {
             return tracklist.get(currentTrackPosition).getTitle();
         }
+    }
+
+    public void setCurrentTrackPosition( int position)
+    {  currentTrackPosition=position;
+
     }
 
     public int getCurrentTrackPosition() {
@@ -203,7 +209,7 @@ public class MyMusicService extends Service {
         switch (status) {
             case STOPED:
                 if (!tracklist.isEmpty()) {
-                    playTrack(0);
+                    playTrack(currentTrackPosition);
                 }
                 break;
             case PLAYING:
@@ -273,11 +279,12 @@ public class MyMusicService extends Service {
         dbOpenHelper.onUpgrade(db, 1, 1);
         for (int i = 0; i < tracklist.size(); i++) {
             ContentValues c = new ContentValues();
-            c.put(DbNowplaying.KEY_POSITION,tracklist.get(i).getTitle());
+            c.put(DbNowplaying.KEY_POSITION,tracklist.get(i).getId());
             c.put(DbNowplaying.KEY_FILE, tracklist.get(i).getTitle());
             db.insert(DbNowplaying.TABLE_NAME, null, c);
         }
         dbOpenHelper.close();
+
     }
 
     public void restoreTracklist() {
@@ -289,6 +296,8 @@ public class MyMusicService extends Service {
             tracklist.add(new Song(c.getLong(0),c.getString(1)));
         }
         dbOpenHelper.close();
+        currentTrackPosition=getCurrentTrackPosition();
+
     }
 
 
@@ -341,8 +350,6 @@ public class MyMusicService extends Service {
         remoteViews.setOnClickPendingIntent(R.id.next_not,next);
         remoteViews.setOnClickPendingIntent(R.id.stop_not,Stop);
 
-
-
         // Create Notification Manager
         NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         // Build Notification with Notification Manager
@@ -352,14 +359,8 @@ public class MyMusicService extends Service {
 
     @Override
     public void onDestroy()
-    { super.onDestroy();
+    {  super.onDestroy();
 
     }
-
-
-
-
-
-
 
 }

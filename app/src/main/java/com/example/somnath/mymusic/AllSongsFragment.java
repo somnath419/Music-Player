@@ -19,6 +19,7 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,13 +63,13 @@ public class AllSongsFragment extends Fragment {
 
         Intent playerServiceIntent = new Intent(getContext(), MyMusicService.class);
         getActivity().bindService(playerServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
-
         IntentFilter filter = new IntentFilter("pos");
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         receiver=new SongsPosition();
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver,filter);
 
-        Toast.makeText(context,"onCreate",Toast.LENGTH_SHORT).show();
+
+
     }
 
 
@@ -100,7 +101,6 @@ public class AllSongsFragment extends Fragment {
         SongAdapter songAdt = new SongAdapter(getContext(),songList);
         list.setAdapter(songAdt);
 
-        Toast.makeText(context,"onCreateView",Toast.LENGTH_SHORT).show();
 
         return v;
     }
@@ -109,7 +109,7 @@ public class AllSongsFragment extends Fragment {
     public  void onResume()
     {
         super.onResume();
-        Toast.makeText(context,"onResume",Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -117,7 +117,6 @@ public class AllSongsFragment extends Fragment {
     {
         super.onPause();
 
-        Toast.makeText(context,"onPause",Toast.LENGTH_SHORT).show();
     }
 
     public void getSongList() {
@@ -160,7 +159,6 @@ public class AllSongsFragment extends Fragment {
             mBoundService.storeTracklist(songList);
 
             Toast.makeText(context,"Hello",Toast.LENGTH_SHORT).show();
-            Toast.makeText(context,"klhjibop",Toast.LENGTH_SHORT).show();
             mBoundService.play(songposition);
         }
     }
@@ -168,7 +166,6 @@ public class AllSongsFragment extends Fragment {
     @Override
     public  void  onDestroy()
     {   super.onDestroy();
-        Toast.makeText(context,"onDestroy",Toast.LENGTH_SHORT).show();
         LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
 
     }

@@ -1,19 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorwhite">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/nowPlaying_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="?colorPrimary"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+    </android.support.v7.widget.Toolbar>
 
     <FrameLayout
         android:id="@+id/song_list"
+        android:layout_below="@id/nowPlayinglist"
         android:layout_width="fill_parent"
         android:layout_height="300sp">
 
 
 
-
     </FrameLayout>
+
+    <ImageView android:layout_width="fill_parent"
+        android:layout_height="300sp"
+        android:layout_below="@id/nowPlaying_toolbar"
+        android:id="@+id/song_icon"
+        />
 
     <Button
         android:id="@+id/nowPlayinglist"
@@ -21,8 +38,9 @@
         android:layout_width="60sp"
         android:layout_marginStart="300sp"
         android:text="@string/now_playing"
-
         />
+
+
 
     <TextView
         android:id="@+id/nameofsong"
@@ -30,9 +48,15 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
         android:maxLines="1"
+        android:paddingTop="15sp"
          android:layout_below="@id/song_list"
         android:textSize="20sp"
         android:layout_alignParentStart="true" />
+
+    <View android:layout_height="1sp"
+        android:layout_below="@+id/nameofsong"
+        android:layout_width="match_parent"
+        android:background="#4004"/>
 
 <RelativeLayout
     android:layout_height="100sp"

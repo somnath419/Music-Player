@@ -52,6 +52,7 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
         if (args != null) {
             arrayList1 = args.getStringArrayList("index");
         }
+
     }
 
     @Override
@@ -64,6 +65,7 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
         ArrayAdapter<String> arrayAdapter =
                 new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1, arrayList1);
         setListAdapter(arrayAdapter);
+
 
 
         return view;
