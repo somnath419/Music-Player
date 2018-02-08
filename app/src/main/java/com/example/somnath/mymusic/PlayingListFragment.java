@@ -19,6 +19,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -48,7 +49,8 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
     @TargetApi(23)
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-         context=getContext();
+        context=getContext();
+        doBindService();
 
         Bundle args = getArguments();
         if (args != null) {
@@ -85,11 +87,21 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
         Toast.makeText(getActivity(), "Item: " + position, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        // TODO Auto-generated method stub
+        super.onListItemClick(l, v, position, id);
+
+        mBoundService.playTrack(position);
+
+
+    }
+
 
     private void doBindService()
     {   Intent i = new Intent(getActivity(), MyMusicService.class);
         getActivity().bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-       mIsBound = true;
+        mIsBound = true;
     }
 
     private void doUnbindService()

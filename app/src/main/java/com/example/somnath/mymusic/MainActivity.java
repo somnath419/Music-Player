@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.example.somnath.mymusic.adapters.TabPagerAdapter;
 
@@ -226,6 +227,8 @@ public class MainActivity extends AppCompatActivity
     {
         super.onDestroy();
         //service stopped
+
+        Toast.makeText(this, "OnDestroy", Toast.LENGTH_SHORT).show();
 
     }
 

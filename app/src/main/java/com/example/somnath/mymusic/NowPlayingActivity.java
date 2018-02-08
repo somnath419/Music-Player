@@ -56,9 +56,11 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        startService(new Intent(NowPlayingActivity.this,MyMusicService.class));
         doBindService();
         setContentView(R.layout.nowplaying_activity);
         context = this;
+
 
         play = (ImageButton) findViewById(R.id.play);
         pause = (ImageButton) findViewById(R.id.pause);
