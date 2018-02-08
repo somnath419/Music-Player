@@ -2,7 +2,6 @@ package com.example.somnath.mymusic;
 
 import android.Manifest;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,14 +9,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.ProgressBar;
 
 import com.example.somnath.mymusic.adapters.MyAdapter;
 
@@ -43,43 +40,26 @@ public class AlbumsFragment extends Fragment {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
-                    // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-                    // app-defined int constantee
+            {    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
                 return v;
             }}
 
         songList = new ArrayList<Song>();
-
-
-
 
         getAlbumsList();
 
         Collections.sort(songList, new Comparator<Song>(){
             public int compare(Song a, Song b){
                 return a.getAlbums().compareTo(b.getAlbums());
-
             }});
 
-
         recyclerView1= (RecyclerView) v.findViewById(R.id.recycleralbum);
-
         mLayoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
-
         recyclerView1.setLayoutManager(mLayoutManager);
-
-
         mAdapter1 = new MyAdapter(getContext(), songList,"albums");
-
         recyclerView1.setAdapter(mAdapter1);
-
         return v;
     }
-
-
-
 
 
     private void getAlbumsList() {
@@ -89,10 +69,8 @@ public class AlbumsFragment extends Fragment {
         Cursor musicCursor =musicResolver.query(smusicUri,null         //should use where clause(_ID==albumid)
                 ,null, null, null);
 
-
-
         if (musicCursor != null && musicCursor.moveToFirst()) {
-//get columns
+            //get columns
             int titleAlbums=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
             int titleArtist=musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int AlbumArt=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART);
@@ -105,7 +83,6 @@ public class AlbumsFragment extends Fragment {
 
                 songList.add(new Song(this_albums,this_artists,this_albumart));
             }
-
             while (musicCursor.moveToNext());
         }
 

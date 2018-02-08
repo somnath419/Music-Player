@@ -36,7 +36,7 @@ public class MyMusicService extends Service {
     private MediaPlayer mediaPlayer;
     private ArrayList<Song> tracklist;
     private int status;
-    private static int currentTrackPosition;
+    private  int currentTrackPosition;
     private boolean taken;
     private IBinder playerBinder;
     private Context context;
@@ -64,7 +64,6 @@ public class MyMusicService extends Service {
         playerBinder = new LocalBinder();
 
         mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-
             @Override
             public void onCompletion(MediaPlayer arg0) {
                 if (currentTrackPosition == tracklist.size()-1) {
@@ -74,14 +73,16 @@ public class MyMusicService extends Service {
                 }
             }
         });
+        Toast.makeText(MyMusicService.this, "OnCreate", Toast.LENGTH_SHORT).show();
 
         restoreTracklist();
-
     }
 
     @Override
     public IBinder onBind(Intent intent)
     {   CustomNotification();
+
+        Toast.makeText(MyMusicService.this, "OnBind", Toast.LENGTH_SHORT).show();
         return playerBinder;
     }
 
@@ -260,7 +261,7 @@ public class MyMusicService extends Service {
 
     public int getCurrentTrackDuration() {
         if (status > STOPED) {
-            return tracklist.get(currentTrackPosition).getDduration();
+            return mediaPlayer.getDuration();
         } else {
             return 0;
         }
@@ -273,6 +274,11 @@ public class MyMusicService extends Service {
         }
     }
 
+    public MediaPlayer mediaPlayer()
+    {
+        return  mediaPlayer;
+    }
+
     public void storeTracklist(ArrayList<Song> tracklist) {
         DbNowplaying dbOpenHelper = new DbNowplaying(getApplicationContext());
         SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
@@ -281,6 +287,8 @@ public class MyMusicService extends Service {
             ContentValues c = new ContentValues();
             c.put(DbNowplaying.KEY_POSITION,tracklist.get(i).getId());
             c.put(DbNowplaying.KEY_FILE, tracklist.get(i).getTitle());
+            c.put(DbNowplaying.IMAGE,tracklist.get(i).getImg_Id());
+            c.put(DbNowplaying.KEY_ARTIST,tracklist.get(i).getArtist());
             db.insert(DbNowplaying.TABLE_NAME, null, c);
         }
         dbOpenHelper.close();
@@ -293,7 +301,7 @@ public class MyMusicService extends Service {
         Cursor c = db.query(DbNowplaying.TABLE_NAME, null, null, null, null, null, null);
         tracklist.clear();
         while (c.moveToNext()) {
-            tracklist.add(new Song(c.getLong(0),c.getString(1)));
+            tracklist.add(new Song(c.getLong(0),c.getString(1),c.getString(2),c.getString(3)));
         }
         dbOpenHelper.close();
         currentTrackPosition=getCurrentTrackPosition();
@@ -343,12 +351,10 @@ public class MyMusicService extends Service {
         PendingIntent pre = PendingIntent.getBroadcast(this, 0,previousclick, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent next = PendingIntent.getBroadcast(this,0,nextclick, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent playPause = PendingIntent.getBroadcast(this,0,play_pause, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent  Stop = PendingIntent.getBroadcast(this,0,stop,PendingIntent.FLAG_UPDATE_CURRENT);
 
         remoteViews.setOnClickPendingIntent(R.id.previous_not,pre);
         remoteViews.setOnClickPendingIntent(R.id.playPause_not,playPause);
         remoteViews.setOnClickPendingIntent(R.id.next_not,next);
-        remoteViews.setOnClickPendingIntent(R.id.stop_not,Stop);
 
         // Create Notification Manager
         NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -359,7 +365,7 @@ public class MyMusicService extends Service {
 
     @Override
     public void onDestroy()
-    {  super.onDestroy();
+    {   super.onDestroy();
 
     }
 

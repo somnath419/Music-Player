@@ -24,7 +24,7 @@
         android:id="@+id/previous_not"
         android:layout_height="60sp"
         android:layout_width="60sp"
-        android:background="@drawable/previous"
+        android:background="@drawable/ic_skip_previous_black_24dp"
         />
 
 
@@ -35,27 +35,23 @@
         android:layout_height="60sp"
         android:layout_width="60sp"
         android:layout_marginStart="30sp"
+        android:layout_marginLeft="30sp"
         android:layout_toEndOf="@id/previous_not"
-        android:background="@drawable/play_button"
+        android:layout_toRightOf="@+id/previous_not"
+        android:background="@drawable/ic_play_circle_outline_black_24dp"
         />
 
     <ImageButton
         android:id="@+id/next_not"
         android:layout_height="60sp"
         android:layout_width="60sp"
-        android:background="@drawable/next"
+        android:background="@drawable/ic_skip_next_black_24dp"
         android:layout_toEndOf="@id/playPause_not"
+        android:layout_toRightOf="@+id/playPause_not"
         android:layout_marginStart="20sp"
+        android:layout_marginLeft="20sp"
         />
 
-    <Button
-        android:id="@+id/stop_not"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stop"
-        android:layout_marginStart="20sp"
-        android:layout_toEndOf="@+id/next_not"
-        />
 
 
 

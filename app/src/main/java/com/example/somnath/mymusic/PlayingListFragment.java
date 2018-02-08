@@ -1,6 +1,7 @@
 package com.example.somnath.mymusic;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ListFragment;
 import android.content.ComponentName;
 import android.content.Context;
@@ -44,6 +45,7 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
     };
 
     @Override
+    @TargetApi(23)
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
          context=getContext();

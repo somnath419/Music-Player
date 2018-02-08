@@ -20,7 +20,8 @@
         android:id="@+id/song_list"
         android:layout_below="@id/nowPlayinglist"
         android:layout_width="fill_parent"
-        android:layout_height="300sp">
+        android:layout_height="match_parent">
+
 
 
 
@@ -32,12 +33,16 @@
         android:id="@+id/song_icon"
         />
 
-    <Button
+
+
+
+    <View
         android:id="@+id/nowPlayinglist"
         android:layout_height="60sp"
         android:layout_width="60sp"
         android:layout_marginStart="300sp"
-        android:text="@string/now_playing"
+        android:layout_marginLeft="300sp"
+        android:background="@drawable/ic_list_white_24dp"
         />
 
 
@@ -49,9 +54,10 @@
         android:textColor="@color/colorAccent"
         android:maxLines="1"
         android:paddingTop="15sp"
-         android:layout_below="@id/song_list"
+         android:layout_below="@id/song_icon"
         android:textSize="20sp"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"/>
 
     <View android:layout_height="1sp"
         android:layout_below="@+id/nameofsong"
@@ -80,7 +86,8 @@
         android:layout_height="60sp"
         android:layout_width="60sp"
         android:layout_marginStart="65sp"
-        android:background="@drawable/previous"
+        android:layout_marginLeft="65dp"
+        android:background="@drawable/ic_skip_previous_black_24dp"
         android:layout_alignParentBottom="true"
         />
 
@@ -99,7 +106,7 @@
         android:id="@+id/play"
        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:background="@drawable/play_button"
+        android:background="@drawable/ic_play_circle_outline_black_24dp"
       />
 
     <ImageButton
@@ -107,7 +114,7 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent"
 
-        android:background="@drawable/pause_button"
+        android:background="@drawable/ic_pause_circle_outline_black_24dp"
        />
 
     </RelativeLayout>
@@ -121,21 +128,15 @@
         android:layout_height="60sp"
         android:layout_width="60sp"
         android:layout_toEndOf="@+id/play_pauselinear"
-          android:layout_marginStart="20sp"
-        android:background="@drawable/next"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
-
-
-    <ImageButton
-        android:id="@+id/nex33t"
-        android:layout_height="60sp"
-        android:layout_width="60sp"
-        android:layout_toEndOf="@+id/next"
+        android:layout_toRightOf="@id/play_pauselinear"
         android:layout_marginStart="20sp"
-        android:background="@drawable/next"
+        android:layout_marginLeft="20sp"
+        android:background="@drawable/ic_skip_next_black_24dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
+
+
 
 
 

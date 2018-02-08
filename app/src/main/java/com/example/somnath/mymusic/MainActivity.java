@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity
     private  NavigationView navigationView;
     private  MyMusicService mBoundService;
     private Context context;
+    private boolean mIsBound;
 
     //This is our viewPager
     private ViewPager viewPager;  //mconnection
@@ -59,6 +60,10 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         context=this;
 
+        startService(new Intent(MainActivity.this,MyMusicService.class));
+        doBindService();
+
+
         //Adding toolbar to the activity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -77,7 +82,13 @@ public class MainActivity extends AppCompatActivity
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(context,NowPlayingActivity.class));
+                Intent i=new Intent(MainActivity.this,NowPlayingActivity.class);
+                if(mBoundService.getStatus()==1){
+                    i.putExtra("from_main_playing",2);
+
+                }
+                else i.putExtra("from_main_not",3);
+                startActivity(i);
             }
         });
 
@@ -97,7 +108,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //service started
-        startService(new Intent(context,MyMusicService.class));
 
     }
 
@@ -163,8 +173,13 @@ public class MainActivity extends AppCompatActivity
 
 
         if (id == R.id.nav_nowplaying) {
+            Intent i = new Intent(MainActivity.this, NowPlayingActivity.class);
 
-            Intent i = new Intent(this, NowPlayingActivity.class);
+            if(mBoundService.getStatus()==1){
+            i.putExtra("from_main_playing",2);
+            }
+            else i.putExtra("from_main_not",3);
+
             startActivity(i);
             return true;
 
@@ -211,6 +226,23 @@ public class MainActivity extends AppCompatActivity
     {
         super.onDestroy();
         //service stopped
+
+    }
+
+
+    private void doBindService()
+    {   Intent i = new Intent(MainActivity.this, MyMusicService.class);
+        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+
+    private void doUnbindService()
+    {
+        if (mIsBound)
+        {   // Detach our existing connection.
+            unbindService(mConnection);
+            mIsBound = false;
+        }
     }
 
 
