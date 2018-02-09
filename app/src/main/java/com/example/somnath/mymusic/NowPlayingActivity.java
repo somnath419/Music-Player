@@ -61,7 +61,6 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         setContentView(R.layout.nowplaying_activity);
         context = this;
 
-
         play = (ImageButton) findViewById(R.id.play);
         pause = (ImageButton) findViewById(R.id.pause);
         previous = (ImageButton) findViewById(R.id.previous);
@@ -71,7 +70,6 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         seekBar1=(SeekBar) findViewById(R.id.seekBar1);
 
         if (getIntent().getIntExtra("from_allsong", 0) == 1) {
-
             String name_image = getIntent().getStringExtra("songimage");
             String name_of_song = getIntent().getStringExtra("songname");
             name_song.setText(name_of_song);
@@ -81,6 +79,7 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
             play.setVisibility(View.GONE);
 
         }
+
         if (getIntent().getIntExtra("from_main_playing", 0) == 2) {
             pause.setVisibility(View.VISIBLE);
             play.setVisibility(View.GONE);
@@ -117,9 +116,12 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
                 for(int i=0;i<arrayList.size();i++)
                    arrayList1.add(arrayList.get(i).getTitle());
 
+                int pos=mBoundService.getCurrentTrackPosition();
+
                 PlayingListFragment playingListFragment=new PlayingListFragment();
                 Bundle args = new Bundle();
                 args.putSerializable("index", arrayList1);
+                args.putInt("position",pos);
                 playingListFragment.setArguments(args);
 
                 getFragmentManager().beginTransaction().replace(R.id.song_list,playingListFragment).commit();
@@ -187,17 +189,12 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     public void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);
     }
-
-    /**
-     * Background Runnable thread
-     * */
+    // Background Runnable thread
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
 
             long totalDuration = mBoundService.getCurrentTrackDuration();
             long currentDuration = mBoundService.getCurrentTrackProgress();
-
-
             // Updating progress bar
             int progress = (int)(getProgressPercentage(currentDuration, totalDuration));
             //Log.d("Progress", ""+progress);
@@ -208,26 +205,20 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         }
     };
 
-    /**
-     *
-     * */
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
 
     }
 
-    /**
-     * When user starts moving the progress handler
-     * */
+    //When user starts moving the progress handler
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
         // remove message Handler from updating progress bar
         mHandler.removeCallbacks(mUpdateTimeTask);
     }
 
-    /**
-     * When user stops moving the progress hanlder
-     * */
+    //When user stops moving the progress hanlder
+
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         mHandler.removeCallbacks(mUpdateTimeTask);

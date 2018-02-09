@@ -308,11 +308,7 @@ public class MyMusicService extends Service {
 
     }
 
-
-
-
     public void CustomNotification() {
-
         // Using RemoteViews to bind custom layouts into Notification
         RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_view);
         // Open NotificationView Class on Notification Click
@@ -324,9 +320,8 @@ public class MyMusicService extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 // Set Icon
-                .setSmallIcon(R.drawable.play)
-                .setContentTitle("Now Playing")
-                // Set Ticker Message
+                .setSmallIcon(R.drawable.ic_play_circle_outline_black_24dp)
+                .setContentTitle("Now Playing")                // Set Ticker Message
                 // Dismiss Notification
                 .setAutoCancel(false)
                 // Set PendingIntent into Notification

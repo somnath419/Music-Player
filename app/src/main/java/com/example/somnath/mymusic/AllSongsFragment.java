@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -43,7 +44,7 @@ public class AllSongsFragment extends Fragment {
     private ListView list;
     private MyMusicService mBoundService;
     private Context context;
-    private boolean mIsBound;
+    private boolean mIsBound,flag_cancel;
 
     //mconnection
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -62,7 +63,7 @@ public class AllSongsFragment extends Fragment {
 
         Activity activity = getActivity();
 
-      doBindService();
+        doBindService();
     }
 
 
@@ -70,28 +71,11 @@ public class AllSongsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.allsong_mainview, container, false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-                // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-                // app-defined int constant
-                return v;
-            }
-        }
 
         list = (ListView) v.findViewById(R.id.list_item);
+
         songList = new ArrayList<Song>();
 
-        getSongList();
-
-        Collections.sort(songList, new Comparator<Song>() {
-            public int compare(Song a, Song b) {
-                return a.getTitle().compareTo(b.getTitle());
-            }
-        });
-
-        SongAdapter songAdt = new SongAdapter(getContext(), songList);
-        list.setAdapter(songAdt);
 
 
         return v;
@@ -100,58 +84,27 @@ public class AllSongsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
+        new List_All_Songs(context).execute();
 
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
-
+        flag_cancel=true;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
 
-    public void getSongList() {
-
-        Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor cursorAudio = context.getContentResolver().query(songUri, null, null, null, null);
-
-
-        Cursor cursorAlbum = null;
-        if (cursorAudio != null && cursorAudio.moveToFirst()) {
-
-            do {
-                long id = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-                String tiitle = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
-                long id_album=cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
-                String artists=cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
-
-
-                Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                        new String[] {MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART,MediaStore.Audio.Albums.ALBUM},
-                        MediaStore.Audio.Albums._ID+ "=?",
-                        new String[] {String.valueOf(id_album)},
-                        null);
-
-                if (cursor.moveToFirst()) {
-                    String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
-                    // do whatever you need to do
-                    songList.add(new Song(id,tiitle,artists,path));
-                }
-
-
-            }
-            while (cursorAudio.moveToNext());
-        }
-
-
-    }
 
     public class SongAdapter extends BaseAdapter {
         private ArrayList<Song> songs;
@@ -201,10 +154,10 @@ public class AllSongsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     mBoundService.storeTracklist(songList);
-                    Intent intent=new Intent(context, NowPlayingActivity.class);
-                    intent.putExtra("from_allsong",1);
-                    intent.putExtra("songname",currSong.getTitle());
-                    intent.putExtra("songimage",currSong.getImg_Id());
+                    Intent intent = new Intent(context, NowPlayingActivity.class);
+                    intent.putExtra("from_allsong", 1);
+                    intent.putExtra("songname", currSong.getTitle());
+                    intent.putExtra("songimage", currSong.getImg_Id());
                     context.startActivity(intent);
 
                     mBoundService.playTrack(position);
@@ -219,19 +172,98 @@ public class AllSongsFragment extends Fragment {
     }
 
 
-    private void doBindService()
-    {   Intent i = new Intent(context, MyMusicService.class);
+    private void doBindService() {
+        Intent i = new Intent(context, MyMusicService.class);
         context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
     }
 
-    private void doUnbindService()
-    {
-        if (mIsBound)
-        {   // Detach our existing connection.
+    private void doUnbindService() {
+        if (mIsBound) {   // Detach our existing connection.
             context.unbindService(mConnection);
             mIsBound = false;
         }
+    }
+
+    //starting of Asynctask
+
+    class List_All_Songs extends AsyncTask<Void, Integer, ArrayList<Song>> {
+
+        private Context context1;
+
+        private List_All_Songs(Context context) {
+            this.context1 = context;
+        }
+
+        protected void onPreExecute() {
+            Toast.makeText(context, "Loading", Toast.LENGTH_SHORT).show();
+        }
+
+        protected ArrayList<Song> doInBackground(Void... params) {
+            getSongList();
+            return songList;
+        }
+
+        protected void onProgressUpdate() {
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+
+
+        protected void onPostExecute(ArrayList<Song> c) {
+            super.onPostExecute(c);
+
+            if(songList != null) {
+                Collections.sort(songList, new Comparator<Song>() {
+                    public int compare(Song a, Song b) {
+                        return a.getTitle().compareTo(b.getTitle());
+                    }
+                });
+                SongAdapter songAdt = new SongAdapter(getContext(), songList);
+                list.setAdapter(songAdt);
+            }
+        }
+
+
+        public void getSongList() {
+
+            Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            Cursor cursorAudio = context.getContentResolver().query(songUri, null, null, null, null);
+
+
+            Cursor cursorAlbum = null;
+            if (cursorAudio != null && cursorAudio.moveToFirst()) {
+                do {
+                      if(isCancelled()||flag_cancel)
+                      {   cancel(true);
+                         break;
+                      }
+
+                    long id = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                    String tiitle = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+                    long id_album = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
+                    String artists = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
+
+                    Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                            new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART, MediaStore.Audio.Albums.ALBUM},
+                            MediaStore.Audio.Albums._ID + "=?",new String[]{String.valueOf(id_album)},null);
+
+                    if (cursor.moveToFirst()) {
+                        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+                        // do whatever you need to do
+                        songList.add(new Song(id, tiitle, artists, path));
+                    }
+                }
+                while (cursorAudio.moveToNext());
+            }
+
+
+        }
+
+
     }
 
 

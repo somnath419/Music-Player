@@ -38,11 +38,6 @@ public class AlbumsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_albums, container, false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            {    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
-                return v;
-            }}
 
         songList = new ArrayList<Song>();
 

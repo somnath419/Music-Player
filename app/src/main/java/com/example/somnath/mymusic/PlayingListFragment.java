@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 
+import android.os.Handler;
 import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,8 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
     private Context context;
     private boolean mIsBound = false;
     private ArrayList<String> arrayList1;
+    private ListView listView;
+    int position;
 
 
     //mconnection
@@ -55,7 +58,10 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
         Bundle args = getArguments();
         if (args != null) {
             arrayList1 = args.getStringArrayList("index");
+            position=args.getInt("position");
+
         }
+
 
     }
 
@@ -65,10 +71,13 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
 
         View view = inflater.inflate(R.layout.playing_list_fragment, container, false);
 
+        listView=view.findViewById(android.R.id.list);
+
 
         ArrayAdapter<String> arrayAdapter =
                 new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1, arrayList1);
         setListAdapter(arrayAdapter);
+        timerDelayRunForScroll(100,position);
 
 
 
@@ -111,5 +120,16 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
             getActivity().unbindService(mConnection);
             mIsBound = false;
         }
+    }
+
+    public void timerDelayRunForScroll(long time, final int post) {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                try {
+                    listView.setSelection(post);
+                } catch (Exception e) {}
+            }
+        }, time);
     }
 }
