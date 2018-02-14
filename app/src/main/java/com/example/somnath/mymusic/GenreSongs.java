@@ -28,8 +28,6 @@ public class GenreSongs extends AppCompatActivity {
         String []str1={str};
 
 
-
-
         ArrayAdapter<String> songAdt = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,str1);
         listView.setAdapter(songAdt);
 

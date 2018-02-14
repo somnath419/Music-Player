@@ -1,12 +1,12 @@
 package com.example.somnath.mymusic;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,7 +28,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 
-public class AllSongsFragment extends Fragment {
+public class GenresFragment extends Fragment {
+
 
     private ArrayList<Song> songList;
     private ListView list;
@@ -51,19 +52,29 @@ public class AllSongsFragment extends Fragment {
     public void onCreate(Bundle s) {
         super.onCreate(s);
         context = getContext();
+        Activity activity = getActivity();
+
+        Toast.makeText(context, "onCreate", Toast.LENGTH_SHORT).show();
+
         doBindService();
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.allsong_mainview, container, false);
 
 
-        progressBar=(ProgressBar) v.findViewById(R.id.progressbar);
         list = (ListView) v.findViewById(R.id.list_item);
+        progressBar=(ProgressBar)v.findViewById(R.id.progressbar);
         songList = new ArrayList<Song>();
+        progressBar.setVisibility(View.VISIBLE);
 
-        new List_All_Songs(context).execute();
+
+        new List_All_Genres(context).execute();
+
+
+
         return v;
     }
 
@@ -129,8 +140,8 @@ public class AllSongsFragment extends Fragment {
             //get song using position
             final Song currSong = songs.get(position);
             //get title and artist string
-            songView.setText(currSong.getTitle());
-            artistView.setText(currSong.getArtist());
+            songView.setText(currSong.getGenres());
+            artistView.setText("somnath");
 
             songLay.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -141,6 +152,7 @@ public class AllSongsFragment extends Fragment {
                     intent.putExtra("songname", currSong.getTitle());
                     intent.putExtra("songimage", currSong.getImg_Id());
                     context.startActivity(intent);
+
                     mBoundService.playTrack(position);
                 }
             });
@@ -168,22 +180,20 @@ public class AllSongsFragment extends Fragment {
 
     //starting of Asynctask
 
-  private class List_All_Songs extends AsyncTask<Void, Integer, ArrayList<Song>> {
+    class List_All_Genres extends AsyncTask<Void, Integer, ArrayList<Song>> {
 
         private Context context1;
 
-        private List_All_Songs(Context context) {
+        private List_All_Genres(Context context) {
             this.context1 = context;
         }
 
         protected void onPreExecute() {
-
-            progressBar.setVisibility(View.VISIBLE);
-
+            Toast.makeText(context, "Loading", Toast.LENGTH_SHORT).show();
         }
 
         protected ArrayList<Song> doInBackground(Void... params) {
-            getSongList();
+            getGenreList();
             return songList;
         }
 
@@ -200,50 +210,65 @@ public class AllSongsFragment extends Fragment {
             super.onPostExecute(c);
 
             if(songList != null) {
-                Collections.sort(songList, new Comparator<Song>() {
-                    public int compare(Song a, Song b) {
-                        return a.getTitle().compareTo(b.getTitle());
-                    }
-                });
+
                 SongAdapter songAdt = new SongAdapter(getContext(), songList);
                 list.setAdapter(songAdt);
-
                 progressBar.setVisibility(View.GONE);
+
             }
         }
 
 
-        public void getSongList() {
+        public void getGenreList() {
+             Cursor mediaCursor;
+            Cursor genresCursor;
 
-            Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-            Cursor cursorAudio = context.getContentResolver().query(songUri, null, null, null, null);
+            String[] mediaProjection = {
+                    MediaStore.Audio.Media._ID,
+                    MediaStore.Audio.Media.ARTIST,
+                    MediaStore.Audio.Media.ALBUM,
+                    MediaStore.Audio.Media.TITLE
+            };
+             String[] genresProjection = {
+                    MediaStore.Audio.Genres.NAME,
+                    MediaStore.Audio.Genres._ID
+            };
 
-            Cursor cursorAlbum = null;
-            if (cursorAudio != null && cursorAudio.moveToFirst()) {
+
+            mediaCursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    mediaProjection, null, null, null);
+
+            int artist_column_index = mediaCursor
+                    .getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
+            int album_column_index = mediaCursor
+                    .getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
+            int title_column_index = mediaCursor
+                    .getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
+            int id_column_index = mediaCursor
+                    .getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+
+            if (mediaCursor.moveToFirst()) {
                 do {
-                      if(isCancelled())
-                      {   cancel(true);
-                         break;
-                      }
+                    int musicId = Integer.parseInt(mediaCursor.getString(id_column_index));
 
-                    long id = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-                    String tiitle = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
-                    long id_album = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
-                    String artists = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
+                    Uri uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", musicId);
+                    genresCursor = context.getContentResolver().query(uri,
+                            genresProjection, null, null, null);
+                    int genre_column_index = genresCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
 
-                    Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                            new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART, MediaStore.Audio.Albums.ALBUM},
-                            MediaStore.Audio.Albums._ID + "=?",new String[]{String.valueOf(id_album)},null);
+                    if (genresCursor.moveToFirst()) {
 
-                    if (cursor.moveToFirst()) {
-                        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
-                        // do whatever you need to do
-                        songList.add(new Song(id, tiitle, artists, path));
+                            String genre= genresCursor.getString(genre_column_index);
+
+                            songList.add(new Song(genre));
+
+
+
                     }
-                }
-                while (cursorAudio.moveToNext());
-            }
 
+
+                } while (mediaCursor.moveToNext());
+            }
 
         }
 

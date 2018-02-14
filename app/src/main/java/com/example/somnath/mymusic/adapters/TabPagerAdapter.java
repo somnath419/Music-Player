@@ -2,6 +2,7 @@ package com.example.somnath.mymusic.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import com.example.somnath.mymusic.AlbumsFragment;
 import com.example.somnath.mymusic.AllSongsFragment;
@@ -9,7 +10,7 @@ import com.example.somnath.mymusic.ArtistsFragment;
 
 
 //Extending FragmentStatePagerAdapter
-public class TabPagerAdapter extends FragmentStatePagerAdapter {
+public class TabPagerAdapter extends FragmentPagerAdapter {
 
     //integer to count number of tabs
     private int tabCount;

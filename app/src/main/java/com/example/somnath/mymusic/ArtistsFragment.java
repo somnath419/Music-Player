@@ -1,12 +1,19 @@
 package com.example.somnath.mymusic;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,6 +22,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.somnath.mymusic.adapters.MyAdapter;
 
@@ -27,82 +35,130 @@ public class ArtistsFragment extends Fragment{
 
 
     private ArrayList<Song> songList;
-    private RecyclerView.LayoutManager mLayoutManager,mLayoutManager2,mLayoutManager3,mLayoutManager4;
-
+    private RecyclerView.LayoutManager mLayoutManager;
+    private Context context;
     private RecyclerView recyclerView;
+    private MyMusicService mBoundService;
+    private boolean mIsBound;
+
+
+    //mconnection
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mBoundService = ((MyMusicService.LocalBinder) service).getService();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+        }
+    };
+
+    @Override
+    public void onCreate(Bundle s) {
+        super.onCreate(s);
+        context = getContext();
+
+        Toast.makeText(context, "onCreateArtists", Toast.LENGTH_SHORT).show();
+        doBindService();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.artist_mainview, container, false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
-              // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-             // app-defined int constant
-                return v;
-            }}
-
         recyclerView=(RecyclerView)v.findViewById(R.id.recyclerArtist);
+
         songList = new ArrayList<Song>();
 
+        new List_All_Artists(context).execute();
 
-        getAritistsList();
-
-        Collections.sort(songList, new Comparator<Song>(){
-            public int compare(Song a, Song b){
-
-                return a.getArtist().compareTo(b.getArtist());
-
-            }});
-
-        mLayoutManager = new LinearLayoutManager(getContext());
-
+        mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
-
-
-        MyAdapter songAdt=new MyAdapter(getContext(),songList,"artists");
-        recyclerView.setAdapter(songAdt);
-
 
         return v;
     }
 
+    //starting of Asynctask
 
+    class List_All_Artists extends AsyncTask<Void, Integer, ArrayList<Song>> {
 
-    private void getAritistsList() {
-        ContentResolver musicResolver = getContext().getContentResolver();
-        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-//get columns
-            int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int titleId = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int titleArtist = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int titleAlbums=musicCursor.getColumnIndex(MediaStore.Audio.Albums._ID);
-            int titleAlbumId = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            int titleGenres=musicCursor.getColumnIndex(MediaStore.Audio.Genres._ID);
-
-
-            //add songs to list
-            do {
-                String thisTitle = musicCursor.getString(titleColumn);
-                long thisId=musicCursor.getInt(titleId);
-                String this_artists=musicCursor.getString(titleArtist);
-                String this_albums=musicCursor.getString(titleAlbums);
-                String this_genre=musicCursor.getString(titleGenres);
-
-                songList.add(new Song(thisId,this_artists,thisTitle,this_albums,this_genre));
-            }
-
-            while (musicCursor.moveToNext());
+        private Context context1;
+        private List_All_Artists(Context context) {
+            this.context1 = context;
         }
 
-        if(musicCursor!=null)
-        {
-            musicCursor.close();
+        protected void onPreExecute() {
+            Toast.makeText(context, "LoadingArtists", Toast.LENGTH_SHORT).show();
+        }
+
+        protected ArrayList<Song> doInBackground(Void... params) {
+            getArtistsList();
+
+            return songList;
+        }
+
+        protected void onProgressUpdate() {
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+
+
+        protected void onPostExecute(ArrayList<Song> c) {
+            super.onPostExecute(c);
+            if(songList != null) {
+
+
+                MyAdapter songAdt=new MyAdapter(context,songList,"artists");
+                recyclerView.setAdapter(songAdt);
+            }
+        }
+
+
+        public void getArtistsList() {
+
+                ContentResolver musicResolver = getActivity().getContentResolver();
+
+                Uri smusicUri = android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+                Cursor musicCursor =musicResolver.query(smusicUri,null         //should use where clause(_ID==albumid)
+                        ,null, null, null);
+
+                if (musicCursor != null && musicCursor.moveToFirst()) {
+                    //get columns
+                    int titleAlbums=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
+                    int titleArtist=musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+                    int AlbumArt=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART);
+
+                    //add songs to list
+                    do {
+                        String this_albums=musicCursor.getString(titleAlbums);
+                        String this_albumart=musicCursor.getString(AlbumArt);
+                        String this_artists=musicCursor.getString(titleArtist);
+
+                        songList.add(new Song(this_artists,this_albums));
+                    }
+                    while (musicCursor.moveToNext());
+                }
+
+                if(musicCursor!=null)
+                {
+                    musicCursor.close();
+                }
+            }
+
+    }
+
+    private void doBindService() {
+        Intent i = new Intent(context, MyMusicService.class);
+        context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+
+    private void doUnbindService() {
+        if (mIsBound) {   // Detach our existing connection.
+            context.unbindService(mConnection);
+            mIsBound = false;
         }
     }
 

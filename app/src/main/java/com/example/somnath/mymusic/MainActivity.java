@@ -17,6 +17,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -33,28 +38,31 @@ import android.widget.Toast;
 
 import com.example.somnath.mymusic.adapters.TabPagerAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,TabLayout.OnTabSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     //This is our tablayout
     private TabLayout tabLayout;
-    private  Menu menu;
-    private  NavigationView navigationView;
-    private  MyMusicService mBoundService;
+    private Menu menu;
+    private NavigationView navigationView;
+    private MyMusicService mBoundService;
     private Context context;
     private boolean mIsBound;
 
     //This is our viewPager
-    private ViewPager viewPager;  //mconnection
+    private ViewPager viewPager;
+    //mconnection
 
-    private ServiceConnection mConnection = new ServiceConnection()
-    {
-        public void onServiceConnected(ComponentName className, IBinder service)
-        {  mBoundService = ((MyMusicService.LocalBinder) service).getService();
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mBoundService = ((MyMusicService.LocalBinder) service).getService();
         }
-        public void onServiceDisconnected(ComponentName className)
-        {
+
+        public void onServiceDisconnected(ComponentName className) {
         }
     };
 
@@ -62,19 +70,19 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            {   requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+            {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
                 // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
                 // app-defined int constant
             }
         }
 
         setContentView(R.layout.activity_main);
-        context=this;
+        context = this;
 
-        startService(new Intent(MainActivity.this,MyMusicService.class));
+        startService(new Intent(MainActivity.this, MyMusicService.class));
         doBindService();
 
 
@@ -89,62 +97,81 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         //Initializing the tablayout
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
-        View view=(View )findViewById(R.id.viewnowPlaying);
+        View view = (View) findViewById(R.id.viewnowPlaying);
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(MainActivity.this,NowPlayingActivity.class);
-                if(mBoundService.getStatus()==1){
-                    i.putExtra("from_main_playing",2);
+                Intent i = new Intent(MainActivity.this, NowPlayingActivity.class);
+                if (mBoundService.getStatus() == 1) {
+                    i.putExtra("from_main_playing", 2);
 
-                }
-                else i.putExtra("from_main_not",3);
+                } else i.putExtra("from_main_not", 3);
                 startActivity(i);
             }
         });
 
-        //Adding the tabs using addTab() method
-        tabLayout.addTab(tabLayout.newTab().setText("Songs"));
-        tabLayout.addTab(tabLayout.newTab().setText("Albums"));
-        tabLayout.addTab(tabLayout.newTab().setText("Artists"));
-        tabLayout.addTab(tabLayout.newTab().setText("Genres"));
-        tabLayout.addTab(tabLayout.newTab().setText("Playlists"));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         viewPager = (ViewPager) findViewById(R.id.pager);
+        setupViewPager(viewPager);
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        tabLayout.setupWithViewPager(viewPager);
 
-        TabPagerAdapter adapter = new TabPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
-        tabLayout.setOnTabSelectedListener(this);
+
         //navigation view
-        navigationView =(NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //service started
 
     }
 
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        viewPager.setCurrentItem(tab.getPosition());
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFrag(new AllSongsFragment(), "SONGS");
+        adapter.addFrag(new AlbumsFragment(), "ALBUMS");
+        adapter.addFrag(new ArtistsFragment(), "ARTISTS");
+        adapter.addFrag(new GenresFragment(), "GENRES");
+        adapter.addFrag(new AllSongsFragment(), "PLAYLISTS");
+
+        viewPager.setAdapter(adapter);
     }
 
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFrag(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
     }
 
+
     @Override
-    public void onTabReselected(TabLayout.Tab tab) {
+    public void onStart() {
+        super.onStart();
+
     }
-
-    @Override
-   public  void onStart()
-   {  super.onStart();
-
-   }
-
 
 
     @Override
@@ -179,7 +206,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -190,10 +216,9 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_nowplaying) {
             Intent i = new Intent(MainActivity.this, NowPlayingActivity.class);
 
-            if(mBoundService.getStatus()==1){
-            i.putExtra("from_main_playing",2);
-            }
-            else i.putExtra("from_main_not",3);
+            if (mBoundService.getStatus() == 1) {
+                i.putExtra("from_main_playing", 2);
+            } else i.putExtra("from_main_not", 3);
 
             startActivity(i);
             return true;
@@ -203,12 +228,12 @@ public class MainActivity extends AppCompatActivity
 
             Intent i = new Intent(this, ScanActivity.class);
             startActivity(i);
-            return  true;
+            return true;
 
         } else if (id == R.id.nav_manage) {
             Intent i = new Intent(this, SettingActivity.class);
             startActivity(i);
-            return  true;
+            return true;
 
         } else if (id == R.id.equalizer) {
             Intent i = new Intent(this, EqualizerActivity.class);
@@ -237,8 +262,7 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
         //service stopped
 
@@ -247,18 +271,35 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private void doBindService()
-    {   Intent i = new Intent(MainActivity.this, MyMusicService.class);
+    private void doBindService() {
+        Intent i = new Intent(MainActivity.this, MyMusicService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
     }
 
-    private void doUnbindService()
-    {
-        if (mIsBound)
-        {   // Detach our existing connection.
+    private void doUnbindService() {
+        if (mIsBound) {   // Detach our existing connection.
             unbindService(mConnection);
             mIsBound = false;
+        }
+    }
+
+    private void askForPermission(String permission, Integer requestCode) {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
+
+                //This is called if user has denied the permission before
+                //In this case I am just asking the permission again
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+
+            } else {
+
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+            }
+        } else {
+            Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
         }
     }
 

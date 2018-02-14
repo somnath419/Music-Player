@@ -30,11 +30,14 @@ public class Song {
         Id=id;
         title=titl;
     }
+    public  Song(String genre)
+    {
+        genre_s=genre;
+    }
 
-    public  Song (long id ,String titl,String io) {
-        Id = id;
-        title = titl;
-        Artist = io;
+    public  Song (String artist,String albums) {
+        a_lbums=albums;
+        Artist = artist;
     }
     public Song(String namealbum,String artists,String albumimage) {
         a_lbums=namealbum;

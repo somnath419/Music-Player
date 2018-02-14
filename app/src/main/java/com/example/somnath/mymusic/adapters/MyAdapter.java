@@ -14,11 +14,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.somnath.mymusic.R;
 import com.example.somnath.mymusic.Song;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -32,12 +30,9 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     public MyAdapter(Context context,ArrayList<Song> songs,String string) {
-
         mContext=context;
         listSong=songs;
         st=string;
-
-
     }
 
     private class ViewHolder0 extends RecyclerView.ViewHolder {
@@ -57,16 +52,10 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private class ViewHolder2 extends RecyclerView.ViewHolder {
 
-        private TextView mTextView,mTextView2;
-        private RelativeLayout mLinearLayout,mLinearLayout2;
-        private ImageView imageView,imageView2;
+        private TextView mTextView_Artist,mTextView2;
         private ViewHolder2(View v){
-
             super(v);
-
-            mTextView=(TextView)v.findViewById(R.id.artist_name);
-
-
+            mTextView_Artist=(TextView)v.findViewById(R.id.name_artist);
 
         }
     }
@@ -86,7 +75,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
             View v1 = LayoutInflater.from(mContext).inflate(R.layout.album_block,parent,false);
-            View v2 = LayoutInflater.from(mContext).inflate(R.layout.artistlists,parent,false);
+            View v2 = LayoutInflater.from(mContext).inflate(R.layout.artist_block,parent,false);
 
             switch (viewType) {
                 case 0:
@@ -108,16 +97,12 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     viewHolder0.mTextView2.setText(currSong.getArtist());
                     Bitmap bm= BitmapFactory.decodeFile(currSong.getAlbumart());
                     viewHolder0.imageView.setImageBitmap(bm);
-
-
                     break;
 
                 case 2:
                     ViewHolder2 viewHolder2 = (ViewHolder2) holder;
-
                     Song currSong2 = listSong.get(position);
-                    viewHolder2.mTextView.setText(currSong2.getArtist());
-
+                    viewHolder2.mTextView_Artist.setText(currSong2.getArtist());
                     break;
             }
         }

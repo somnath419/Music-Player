@@ -12,20 +12,21 @@
         android:background="@color/colorwhite" />
 
     <TextView
-        android:id="@+id/artist_name"
+        android:id="@+id/name_artist"
         android:layout_width="match_parent"
         android:textSize="25sp"
         android:layout_height="wrap_content"
         android:textColor="@color/colorblack"
         android:maxLines="1"
         android:layout_toEndOf="@+id/space"
+        android:layout_toRightOf="@+id/space"
         />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="10sp"
         android:id="@+id/space2"
-        android:layout_below="@id/artist_name"
+        android:layout_below="@id/name_artist"
         android:background="@color/colorwhite" />
 
 
