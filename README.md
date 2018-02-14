@@ -1,2 +1,2 @@
 # MusicPlayer
-Music Player for Android which is still in development phase and is aimed at giving the newcomers of android to refer it to gain some knowledge about android.
+Music Player is a light weight Android App. One can learn about databases(SQLite), services, binding service and controlling them by fragments and activities after going through this repositories.
