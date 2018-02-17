@@ -1,6 +1,7 @@
 package com.example.somnath.mymusic;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -67,22 +68,15 @@ public class MainActivity extends AppCompatActivity
     };
 
     @Override
+    @TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
-                // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-                // app-defined int constant
-            }
-        }
+
 
         setContentView(R.layout.activity_main);
         context = this;
-
-        startService(new Intent(MainActivity.this, MyMusicService.class));
+        startService(new Intent(MainActivity.this,MyMusicService.class));
         doBindService();
 
 
@@ -104,6 +98,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, NowPlayingActivity.class);
+
                 if (mBoundService.getStatus() == 1) {
                     i.putExtra("from_main_playing", 2);
 
@@ -184,6 +179,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();
+
+        doUnbindService();
+        Toast.makeText(context, "doUnbindservice from mainactivity", Toast.LENGTH_SHORT).show();
+
     }
 
 
@@ -266,7 +265,6 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         //service stopped
 
-        Toast.makeText(this, "OnDestroy", Toast.LENGTH_SHORT).show();
 
     }
 

@@ -26,13 +26,12 @@ import java.util.Comparator;
 public class AlbumsFragment extends Fragment {
 
 
-    private ArrayList<Song> songList;
+    private ArrayList<Song> albumList;
     private RecyclerView recyclerView1,recyclerView2;
     private RecyclerView.Adapter mAdapter1,mAdapter2,mAdapter3,mAdapter4;
     private RecyclerView.LayoutManager mLayoutManager,mLayoutManager2,mLayoutManager3,mLayoutManager4;
     private GridView list;
     private Context context;
-
 
     @Override
     public void onCreate(Bundle s) {
@@ -48,7 +47,7 @@ public class AlbumsFragment extends Fragment {
 
         recyclerView1= (RecyclerView) v.findViewById(R.id.recycleralbum);
 
-        songList = new ArrayList<Song>();
+        albumList = new ArrayList<Song>();
 
         new List_All_Albums(context).execute();
 
@@ -73,7 +72,7 @@ public class AlbumsFragment extends Fragment {
 
         protected ArrayList<Song> doInBackground(Void... params) {
             getAlbumsList();
-            return songList;
+            return albumList;
         }
 
         protected void onProgressUpdate() {
@@ -88,13 +87,13 @@ public class AlbumsFragment extends Fragment {
         protected void onPostExecute(ArrayList<Song> c) {
             super.onPostExecute(c);
 
-            if(songList != null) {
-                Collections.sort(songList, new Comparator<Song>(){
+            if(albumList != null) {
+                Collections.sort(albumList, new Comparator<Song>(){
                     public int compare(Song a, Song b){
                         return a.getAlbums().compareTo(b.getAlbums());
                     }
                 });
-                mAdapter1 = new MyAdapter(getContext(), songList,"albums");
+                mAdapter1 = new MyAdapter(getContext(), albumList,"albums");
                 recyclerView1.setAdapter(mAdapter1);
             }
         }
@@ -118,7 +117,8 @@ public class AlbumsFragment extends Fragment {
                     String this_albumart=musicCursor.getString(AlbumArt);
                     String this_artists=musicCursor.getString(titleArtist);
 
-                    songList.add(new Song(this_albums,this_artists,this_albumart));
+
+                    albumList.add(new Song(this_albums,this_artists,this_albumart));
                 }
                 while (musicCursor.moveToNext());
             }
@@ -129,7 +129,6 @@ public class AlbumsFragment extends Fragment {
             }
         }
     }
-
 }
 
 

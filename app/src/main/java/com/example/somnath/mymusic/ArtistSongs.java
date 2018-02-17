@@ -13,6 +13,8 @@ import android.widget.ListView;
  */
 
 public class ArtistSongs extends AppCompatActivity {
+
+
     protected void onCreate( Bundle savedInstanceState)
     {
 

@@ -62,7 +62,6 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
 
         }
 
-
     }
 
     @Override
@@ -131,5 +130,12 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
                 } catch (Exception e) {}
             }
         }, time);
+    }
+
+    @Override
+    public void onDestroy()
+    {super.onDestroy();
+        doUnbindService();
+        Toast.makeText(context, "OnDestroy fragment", Toast.LENGTH_SHORT).show();
     }
 }

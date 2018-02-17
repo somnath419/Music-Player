@@ -56,8 +56,6 @@ public class ArtistsFragment extends Fragment{
     public void onCreate(Bundle s) {
         super.onCreate(s);
         context = getContext();
-
-        Toast.makeText(context, "onCreateArtists", Toast.LENGTH_SHORT).show();
         doBindService();
     }
 
@@ -87,7 +85,6 @@ public class ArtistsFragment extends Fragment{
         }
 
         protected void onPreExecute() {
-            Toast.makeText(context, "LoadingArtists", Toast.LENGTH_SHORT).show();
         }
 
         protected ArrayList<Song> doInBackground(Void... params) {

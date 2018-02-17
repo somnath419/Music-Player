@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -64,6 +65,7 @@ public class AllSongsFragment extends Fragment {
         songList = new ArrayList<Song>();
 
         new List_All_Songs(context).execute();
+
         return v;
     }
 
@@ -85,6 +87,7 @@ public class AllSongsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        doUnbindService();
     }
 
 
@@ -122,7 +125,7 @@ public class AllSongsFragment extends Fragment {
 
 
             //map to song layout
-            RelativeLayout songLay = (RelativeLayout) songInf.inflate(R.layout.allsongs_block, parent, false);
+            final RelativeLayout songLay = (RelativeLayout) songInf.inflate(R.layout.allsongs_block, parent, false);
             //get title and artist views
             TextView songView = (TextView) songLay.findViewById(R.id.albums_text);
             TextView artistView = (TextView) songLay.findViewById(R.id.artist_albums);
@@ -136,7 +139,8 @@ public class AllSongsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     mBoundService.storeTracklist(songs);
-                    Intent intent = new Intent(context, NowPlayingActivity.class);
+
+                    Intent intent = new Intent(getActivity(), NowPlayingActivity.class);
                     intent.putExtra("from_allsong", 1);
                     intent.putExtra("songname", currSong.getTitle());
                     intent.putExtra("songimage", currSong.getImg_Id());
@@ -183,7 +187,8 @@ public class AllSongsFragment extends Fragment {
         }
 
         protected ArrayList<Song> doInBackground(Void... params) {
-            getSongList();
+            getsongList();
+
             return songList;
         }
 
@@ -199,12 +204,9 @@ public class AllSongsFragment extends Fragment {
         protected void onPostExecute(ArrayList<Song> c) {
             super.onPostExecute(c);
 
-            if(songList != null) {
-                Collections.sort(songList, new Comparator<Song>() {
-                    public int compare(Song a, Song b) {
-                        return a.getTitle().compareTo(b.getTitle());
-                    }
-                });
+            if(songList!= null) {
+                getTopRecentAdded(songList);
+
                 SongAdapter songAdt = new SongAdapter(getContext(), songList);
                 list.setAdapter(songAdt);
 
@@ -213,12 +215,11 @@ public class AllSongsFragment extends Fragment {
         }
 
 
-        public void getSongList() {
+        private void getsongList() {
 
             Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             Cursor cursorAudio = context.getContentResolver().query(songUri, null, null, null, null);
 
-            Cursor cursorAlbum = null;
             if (cursorAudio != null && cursorAudio.moveToFirst()) {
                 do {
                       if(isCancelled())
@@ -230,6 +231,7 @@ public class AllSongsFragment extends Fragment {
                     String tiitle = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
                     long id_album = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
                     String artists = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
+                    int getAdded=cursorAudio.getInt(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED));
 
                     Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                             new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART, MediaStore.Audio.Albums.ALBUM},
@@ -238,7 +240,7 @@ public class AllSongsFragment extends Fragment {
                     if (cursor.moveToFirst()) {
                         String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
                         // do whatever you need to do
-                        songList.add(new Song(id, tiitle, artists, path));
+                        songList.add(new Song(id, tiitle, artists, path,getAdded));
                     }
                 }
                 while (cursorAudio.moveToNext());
@@ -247,8 +249,20 @@ public class AllSongsFragment extends Fragment {
 
         }
 
+      public void getTopRecentAdded(ArrayList<Song> list) {
+          Collections.sort(list, new Comparator<Song>() {
+              @Override
+              public int compare(Song left, Song right) {
+                  return left.getDate_added() - right.getDate_added();
+              }
+          });
+
+          Collections.reverse(list);
+      }
+
 
     }
+
 
 
 }

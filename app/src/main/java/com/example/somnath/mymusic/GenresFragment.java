@@ -54,8 +54,6 @@ public class GenresFragment extends Fragment {
         context = getContext();
         Activity activity = getActivity();
 
-        Toast.makeText(context, "onCreate", Toast.LENGTH_SHORT).show();
-
         doBindService();
     }
 
@@ -189,7 +187,6 @@ public class GenresFragment extends Fragment {
         }
 
         protected void onPreExecute() {
-            Toast.makeText(context, "Loading", Toast.LENGTH_SHORT).show();
         }
 
         protected ArrayList<Song> doInBackground(Void... params) {

@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -79,10 +80,15 @@ public class MyMusicService extends Service {
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        return  START_NOT_STICKY;
+    }
+
+    @Override
     public IBinder onBind(Intent intent)
     {   CustomNotification();
 
-        Toast.makeText(MyMusicService.this, "OnBind", Toast.LENGTH_SHORT).show();
         return playerBinder;
     }
 
@@ -91,6 +97,8 @@ public class MyMusicService extends Service {
     {
         return super.onUnbind(intent);
     }
+
+
 
     public void take() {
         taken = true;
@@ -293,6 +301,8 @@ public class MyMusicService extends Service {
         }
         dbOpenHelper.close();
 
+        restoreTracklist();
+
     }
 
     public void restoreTracklist() {
@@ -359,8 +369,12 @@ public class MyMusicService extends Service {
     }
 
     @Override
+    @TargetApi(24)
     public void onDestroy()
     {   super.onDestroy();
+
+       stopSelf();
+       stopForeground(STOP_FOREGROUND_REMOVE);
 
     }
 

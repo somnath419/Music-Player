@@ -21,6 +21,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 
 public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarChangeListener {
@@ -34,9 +36,11 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     private  ImageButton play,pause,previous,next;
     private ArrayList<Song> arrayList;
     private ArrayList<String> arrayList1;
+    private ArrayList<Song> arraylist_from_other;
     private TextView name_song ;
     private ImageView album_icon;
     int set_list=0;
+    private int curr;
     private Handler mHandler = new Handler();;
 
     //mconnection
@@ -56,9 +60,10 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        startService(new Intent(NowPlayingActivity.this,MyMusicService.class));
-        doBindService();
+
         setContentView(R.layout.nowplaying_activity);
+        doBindService();
+
         context = this;
 
         play = (ImageButton) findViewById(R.id.play);
@@ -69,9 +74,11 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         name_song = (TextView) findViewById(R.id.nameofsong);
         seekBar1=(SeekBar) findViewById(R.id.seekBar1);
 
+
         if (getIntent().getIntExtra("from_allsong", 0) == 1) {
             String name_image = getIntent().getStringExtra("songimage");
             String name_of_song = getIntent().getStringExtra("songname");
+
             name_song.setText(name_of_song);
             Bitmap bm = BitmapFactory.decodeFile(name_image);
             album_icon.setImageBitmap(bm);
@@ -242,22 +249,24 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     {   super.onResume();
 
       if(mBoundService!=null) {
-          arrayList = mBoundService.getTracklist();
-          String name = arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-          name_song.setText(name);
 
-          String image = arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-          Bitmap bm = BitmapFactory.decodeFile(image);
-          album_icon.setImageBitmap(bm);
-          name_song.setText(name);
+          if(mBoundService.getTracklist()!=null) {
+              arrayList = mBoundService.getTracklist();
+              String name = arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
+              name_song.setText(name);
 
-          if (mBoundService.getStatus() == 1) {
-              play.setVisibility(View.GONE);
-              pause.setVisibility(View.VISIBLE);
-          } else
-          {
-              pause.setVisibility(View.GONE);
-              play.setVisibility(View.VISIBLE);
+              String image = arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
+              Bitmap bm = BitmapFactory.decodeFile(image);
+              album_icon.setImageBitmap(bm);
+              name_song.setText(name);
+
+              if (mBoundService.getStatus() == 1) {
+                  play.setVisibility(View.GONE);
+                  pause.setVisibility(View.VISIBLE);
+              } else {
+                  pause.setVisibility(View.GONE);
+                  play.setVisibility(View.VISIBLE);
+              }
           }
 
       }
@@ -297,10 +306,7 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         }
     }
 
-    @Override
-    protected void onDestroy()
-    {super.onDestroy();
-    }
+
 
     public static class NotificationListener extends BroadcastReceiver {
 
@@ -320,6 +326,14 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
                 mBoundService.play();
             }
 
+        }
+    }
+
+    public static class PlayClickSong extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String string = intent.getAction();
 
 
 
@@ -342,10 +356,16 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     public int progressToTimer(int progress, int totalDuration) {
         int currentDuration = 0;
         totalDuration = (int) (totalDuration / 1000);
-        currentDuration = (int) ((((double)progress) / 100) * totalDuration);
+        currentDuration = (int) ((((double) progress) / 100) * totalDuration);
 
         // return current duration in milliseconds
         return currentDuration * 1000;
+    }
+
+    @Override
+    public void onDestroy()
+    {super.onDestroy();
+        doUnbindService();
     }
 
 
