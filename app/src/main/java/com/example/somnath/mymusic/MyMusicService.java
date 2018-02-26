@@ -68,13 +68,14 @@ public class MyMusicService extends Service {
             @Override
             public void onCompletion(MediaPlayer arg0) {
                 if (currentTrackPosition == tracklist.size()-1) {
-                    stop();
+                    playTrack(0);
                 } else {
                     nextTrack();
                 }
             }
         });
-        Toast.makeText(MyMusicService.this, "OnCreate", Toast.LENGTH_SHORT).show();
+
+
 
         restoreTracklist();
     }
@@ -300,6 +301,8 @@ public class MyMusicService extends Service {
             db.insert(DbNowplaying.TABLE_NAME, null, c);
         }
         dbOpenHelper.close();
+
+        currentTrackPosition=0;
 
         restoreTracklist();
 

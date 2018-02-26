@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -53,6 +54,8 @@ public class AlbumsFragment extends Fragment {
 
         mLayoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         recyclerView1.setLayoutManager(mLayoutManager);
+
+
 
         return v ;
     }
@@ -110,15 +113,21 @@ public class AlbumsFragment extends Fragment {
                 int titleAlbums=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
                 int titleArtist=musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
                 int AlbumArt=musicCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART);
+                int Album_Id=musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID);
+
+
+
 
                 //add songs to list
                 do {
                     String this_albums=musicCursor.getString(titleAlbums);
                     String this_albumart=musicCursor.getString(AlbumArt);
                     String this_artists=musicCursor.getString(titleArtist);
+                    long album_id=musicCursor.getLong(Album_Id);
 
 
-                    albumList.add(new Song(this_albums,this_artists,this_albumart));
+
+                    albumList.add(new Song(this_albums,this_artists,this_albumart,album_id));
                 }
                 while (musicCursor.moveToNext());
             }

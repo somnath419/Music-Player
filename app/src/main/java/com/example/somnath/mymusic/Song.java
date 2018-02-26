@@ -15,6 +15,7 @@ public class Song {
     private int Dduration;
     private String img_Id;
     private int date_added;
+    private long album_ID;
 
 
     public Song(long id, String artist,String songTitle,String albums,String genres) {
@@ -24,7 +25,6 @@ public class Song {
         a_lbums=albums;
         genre_s=genres;
     }
-
 
     public  Song (long id ,String titl)
     {
@@ -46,6 +46,19 @@ public class Song {
         Artist=artists;
     }
 
+
+    public Song(String namealbum,String artists,String albumimage,long Albums_id) {
+        a_lbums=namealbum;
+        albumart=albumimage;
+        Artist=artists;
+        album_ID=Albums_id;
+
+
+    }
+
+
+
+
     public Song(long id, String songTitle,String artist,String art_album) {
         Id =id;
         title=songTitle;
@@ -61,6 +74,14 @@ public class Song {
         date_added=date_Added;
     }
 
+    public Song(long id, String songTitle,String artist,int date_Added) {
+        Id =id;
+        title=songTitle;
+        Artist=artist;
+        date_added=date_Added;
+    }
+
+
 
 
     public String getTitle(){return title;}
@@ -72,6 +93,7 @@ public class Song {
     public  int getDduration(){return Dduration;}
     public String getImg_Id(){return img_Id;}
     public int getDate_added(){return date_added;}
+    public long getAlbum_ID(){ return album_ID;}
 
 
 

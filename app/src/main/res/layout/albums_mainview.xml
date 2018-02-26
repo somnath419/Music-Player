@@ -10,6 +10,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycleralbum"
         android:layout_width="match_parent"
+        android:background="#4d0440"
         android:layout_height="0dp"
         >
 

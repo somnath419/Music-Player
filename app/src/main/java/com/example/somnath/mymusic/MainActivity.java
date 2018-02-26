@@ -98,11 +98,16 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, NowPlayingActivity.class);
+                if(mBoundService.getTracklist().size()>0)
+                {   if (mBoundService.getStatus() == 1)
+                        i.putExtra("from_main_playing", 2);
+                    else
+                        i.putExtra("from_main_not", 3);
+                }
+                else
+                    i.putExtra("empty_list",4);
 
-                if (mBoundService.getStatus() == 1) {
-                    i.putExtra("from_main_playing", 2);
 
-                } else i.putExtra("from_main_not", 3);
                 startActivity(i);
             }
         });
@@ -118,6 +123,11 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //service started
+
+
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
 
     }
 
@@ -179,9 +189,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();
-
         doUnbindService();
-        Toast.makeText(context, "doUnbindservice from mainactivity", Toast.LENGTH_SHORT).show();
+
 
     }
 
@@ -215,11 +224,16 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_nowplaying) {
             Intent i = new Intent(MainActivity.this, NowPlayingActivity.class);
 
-            if (mBoundService.getStatus() == 1) {
-                i.putExtra("from_main_playing", 2);
-            } else i.putExtra("from_main_not", 3);
-
+            if(mBoundService.getTracklist().size()>0){
+                  if (mBoundService.getStatus() == 1)
+                      i.putExtra("from_main_playing", 2);
+                  else
+                     i.putExtra("from_main_not", 3);
+            }
+            else
+                     i.putExtra("empty_list",4);
             startActivity(i);
+
             return true;
 
 
@@ -279,25 +293,6 @@ public class MainActivity extends AppCompatActivity
         if (mIsBound) {   // Detach our existing connection.
             unbindService(mConnection);
             mIsBound = false;
-        }
-    }
-
-    private void askForPermission(String permission, Integer requestCode) {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
-
-                //This is called if user has denied the permission before
-                //In this case I am just asking the permission again
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
-
-            } else {
-
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
-            }
-        } else {
-            Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
         }
     }
 

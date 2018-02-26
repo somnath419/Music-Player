@@ -4,42 +4,45 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:id="@+id/mainrelative"
+    android:background="#4d0440"
     android:layout_height="match_parent">
 
      <View
          android:layout_width="20sp"
          android:layout_height="30sp"
          android:id="@+id/spaceall_list"
-         android:background="@color/colorwhite" />
+          />
 
      <TextView
         android:id="@+id/albums_text"
         android:layout_width="match_parent"
          android:textSize="20sp"
         android:layout_height="wrap_content"
-         android:textColor="@color/colorAccent"
+         android:textColor="@color/colorwhite"
          android:maxLines="1"
          android:layout_toEndOf="@id/spaceall_list"
-
-
-        />
+         android:layout_toRightOf="@+id/spaceall_list"
+         />
 
      <TextView
          android:id="@+id/artist_albums"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
+         android:textSize="12sp"
          android:layout_below="@id/albums_text"
+         android:textColor="@color/colorwhite"
          android:maxLines="1"
          android:layout_toEndOf="@+id/spaceall_list"
+         android:layout_toRightOf="@+id/spaceall_list"
          />
 
 
      <View
          android:layout_width="match_parent"
-         android:layout_height="10sp"
+         android:layout_height="12sp"
          android:id="@+id/space25"
          android:layout_below="@id/artist_albums"
-         android:background="@color/colorwhite" />
+          />
 
 
 

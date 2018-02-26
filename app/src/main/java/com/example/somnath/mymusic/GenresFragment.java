@@ -144,14 +144,7 @@ public class GenresFragment extends Fragment {
             songLay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mBoundService.storeTracklist(songs);
-                    Intent intent = new Intent(context, NowPlayingActivity.class);
-                    intent.putExtra("from_allsong", 1);
-                    intent.putExtra("songname", currSong.getTitle());
-                    intent.putExtra("songimage", currSong.getImg_Id());
-                    context.startActivity(intent);
 
-                    mBoundService.playTrack(position);
                 }
             });
             //set position as tag

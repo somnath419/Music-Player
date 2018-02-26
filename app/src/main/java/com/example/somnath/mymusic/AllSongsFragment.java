@@ -207,10 +207,11 @@ public class AllSongsFragment extends Fragment {
             if(songList!= null) {
                 getTopRecentAdded(songList);
 
+                progressBar.setVisibility(View.GONE);
+
                 SongAdapter songAdt = new SongAdapter(getContext(), songList);
                 list.setAdapter(songAdt);
 
-                progressBar.setVisibility(View.GONE);
             }
         }
 
@@ -245,8 +246,6 @@ public class AllSongsFragment extends Fragment {
                 }
                 while (cursorAudio.moveToNext());
             }
-
-
         }
 
       public void getTopRecentAdded(ArrayList<Song> list) {
