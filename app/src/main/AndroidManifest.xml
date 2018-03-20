@@ -125,25 +125,9 @@
         </service>
 
 
-        <receiver android:name=".NowPlayingActivity$NotificationListener">
 
-            <intent-filter >
-                <action android:name="previous"/>
-                <action android:name="next"/>
-                <action android:name="play"/>
-                <action android:name="stop"/>
-            </intent-filter>
 
-        </receiver>
 
-        <receiver android:name=".NowPlayingActivity$PlayClickSong">
-
-            <intent-filter >
-                <action android:name="clicksong"/>
-
-            </intent-filter>
-
-        </receiver>
 
 
     </application>

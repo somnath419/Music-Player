@@ -355,40 +355,6 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         }
     }
 
-
-
-    public static class NotificationListener extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String string = intent.getAction();
-
-            if (string.equals("previous")) {
-                mBoundService.prevTrack();
-            }
-            else
-            if (string.equals("next"))
-            {  mBoundService. nextTrack();
-            }
-            else if(string.equals("play"))
-            {
-                mBoundService.play();
-            }
-
-        }
-    }
-
-    public static class PlayClickSong extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String string = intent.getAction();
-
-
-
-        }
-    }
-
     public int getProgressPercentage(long currentDuration, long totalDuration){
         Double percentage = (double) 0;
 

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -15,6 +16,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,11 +25,15 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio;
+import android.app.Notification;
+
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -38,11 +44,17 @@ public class MyMusicService extends Service {
     private ArrayList<Song> tracklist;
     private int status;
     private  int currentTrackPosition;
+    private BroadcastReceiver receiver;
     private boolean taken;
     private IBinder playerBinder;
     private Context context;
     SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
+    private static final int NOTIF_ID = 1234;
+    private NotificationCompat.Builder mBuilder;
+    private NotificationManager mNotificationManager;
+    private RemoteViews mRemoteviews;
+    private Notification mNotification;
 
     public class LocalBinder extends Binder
     {    public MyMusicService getService() {
@@ -89,6 +101,49 @@ public class MyMusicService extends Service {
     @Override
     public IBinder onBind(Intent intent)
     {   CustomNotification();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("play");
+        filter.addAction("pause");
+        filter.addAction("next");
+        filter.addAction("previous");
+        filter.addAction("clear");
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //do something based on the intent's action
+
+                switch (intent.getAction())
+                {
+                    case "play":
+                        play();
+                        CustomNotification();
+                        updateNotification();
+                        break;
+                    case "pause":
+                        play();
+                        CustomNotification();
+                        updateNotification();
+                        break;
+                    case "next":
+                        nextTrack();
+                        CustomNotification();
+                        updateNotification();
+                        break;
+                    case "previous":
+                        prevTrack();
+                        CustomNotification();
+                        updateNotification();
+                        break;
+                    case "clear":
+                        stopForeground(true);
+                        stopService(new Intent(context,MyMusicService.class));
+                        break;
+                }
+            }
+        };
+        registerReceiver(receiver, filter);
 
         return playerBinder;
     }
@@ -322,8 +377,11 @@ public class MyMusicService extends Service {
     }
 
     public void CustomNotification() {
-        // Using RemoteViews to bind custom layouts into Notification
-        RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_view);
+        // Using mRemoteviews to bind custom layouts into Notification
+
+
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+         mRemoteviews = new RemoteViews(getPackageName(),R.layout.notification_view);
         // Open NotificationView Class on Notification Click
         Intent intent = new Intent(this,MainActivity.class);
 
@@ -331,7 +389,7 @@ public class MyMusicService extends Service {
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+         mBuilder = new NotificationCompat.Builder(this)
                 // Set Icon
                 .setSmallIcon(R.drawable.ic_play_circle_outline_black_24dp)
                 .setContentTitle("Now Playing")                // Set Ticker Message
@@ -339,35 +397,63 @@ public class MyMusicService extends Service {
                 .setAutoCancel(false)
                 // Set PendingIntent into Notification
                 .setContentIntent(pIntent)
-                // Set RemoteViews into Notification
-                .setContent(remoteViews);
+                // Set mRemoteviews into Notification
+                .setContent(mRemoteviews);
 
 
         Intent previousclick = new Intent("previous");
-        previousclick.putExtra("previous",1);
-
         Intent nextclick = new Intent("next");
-        nextclick.putExtra("extra", "hello");
-
-        Intent play_pause = new Intent("play");
-        play_pause.putExtra("play",3);
-
-        Intent stop = new Intent("stop");
-        stop.putExtra("stop",4);
+        Intent play = new Intent("play");
+        Intent pause = new Intent("stop");
+        Intent clear=new Intent("clear");
 
 
         PendingIntent pre = PendingIntent.getBroadcast(this, 0,previousclick, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent next = PendingIntent.getBroadcast(this,0,nextclick, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent playPause = PendingIntent.getBroadcast(this,0,play_pause, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent playPause = PendingIntent.getBroadcast(this,0,play, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent Pause = PendingIntent.getBroadcast(this,0,pause, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent Clear = PendingIntent.getBroadcast(this,0,clear, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        remoteViews.setOnClickPendingIntent(R.id.previous_not,pre);
-        remoteViews.setOnClickPendingIntent(R.id.playPause_not,playPause);
-        remoteViews.setOnClickPendingIntent(R.id.next_not,next);
+
+        mRemoteviews.setOnClickPendingIntent(R.id.previous_not,pre);
+        mRemoteviews.setOnClickPendingIntent(R.id.playPause_not,playPause);
+        mRemoteviews.setOnClickPendingIntent(R.id.next_not,next);
+        mRemoteviews.setOnClickPendingIntent(R.id.pause_noti,Pause);
+        mRemoteviews.setOnClickPendingIntent(R.id.clear_not,Clear);
+
 
         // Create Notification Manager
-        NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
         // Build Notification with Notification Manager
-        startForeground(1337,builder.build());
+        startForeground(NOTIF_ID,mBuilder.build());
+
+    }
+
+    // use this method to update the Notification's UI
+    public void updateNotification()
+    {
+        int api = Build.VERSION.SDK_INT;
+
+        if(getTracklist().size()>0)
+        mRemoteviews.setTextViewText(R.id.notification_title,getTracklist().get(getCurrentTrackPosition()).getTitle());
+
+        if (api < Build.VERSION_CODES.HONEYCOMB) {
+            mNotificationManager.notify(NOTIF_ID, mNotification);
+        }else if (api >= Build.VERSION_CODES.HONEYCOMB) {
+            mNotificationManager.notify(NOTIF_ID, mBuilder.build());
+        }
+
+        if(getStatus()==1)
+        {
+            mRemoteviews.setViewVisibility(R.id.pause_noti, View.VISIBLE);
+            mRemoteviews.setViewVisibility(R.id.playPause_not,View.GONE);
+        }
+        else
+            {
+                mRemoteviews.setViewVisibility(R.id.pause_noti, View.GONE);
+                mRemoteviews.setViewVisibility(R.id.playPause_not,View.VISIBLE);
+            }
+
 
     }
 

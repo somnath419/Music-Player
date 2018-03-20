@@ -18,7 +18,7 @@
             android:title="@string/settings" />
         <item
             android:id="@+id/equalizer"
-            android:icon="@drawable/equ_128"
+            android:icon="@drawable/ic_equalizer_black_24dp"
             android:title="@string/equalizer" />
 
         <item

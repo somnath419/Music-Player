@@ -146,6 +146,8 @@ public class AllSongsFragment extends Fragment {
                     intent.putExtra("songimage", currSong.getImg_Id());
                     context.startActivity(intent);
                     mBoundService.playTrack(position);
+                    mBoundService.CustomNotification();
+                    mBoundService.updateNotification();
                 }
             });
             //set position as tag
