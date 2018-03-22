@@ -1,11 +1,6 @@
 package com.example.somnath.mymusic;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -28,8 +23,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.provider.MediaStore.Audio;
-import android.app.Notification;
 
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -100,8 +93,7 @@ public class MyMusicService extends Service {
 
     @Override
     public IBinder onBind(Intent intent)
-    {   CustomNotification();
-
+    {
         IntentFilter filter = new IntentFilter();
         filter.addAction("play");
         filter.addAction("pause");
@@ -138,6 +130,7 @@ public class MyMusicService extends Service {
                         break;
                     case "clear":
                         stopForeground(true);
+                        stop();
                         stopService(new Intent(context,MyMusicService.class));
                         break;
                 }
@@ -408,6 +401,7 @@ public class MyMusicService extends Service {
         Intent clear=new Intent("clear");
 
 
+
         PendingIntent pre = PendingIntent.getBroadcast(this, 0,previousclick, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent next = PendingIntent.getBroadcast(this,0,nextclick, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent playPause = PendingIntent.getBroadcast(this,0,play, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -421,10 +415,8 @@ public class MyMusicService extends Service {
         mRemoteviews.setOnClickPendingIntent(R.id.pause_noti,Pause);
         mRemoteviews.setOnClickPendingIntent(R.id.clear_not,Clear);
 
+        mRemoteviews.setViewVisibility(R.id.playPause_not,View.GONE);
 
-        // Create Notification Manager
-
-        // Build Notification with Notification Manager
         startForeground(NOTIF_ID,mBuilder.build());
 
     }
@@ -461,8 +453,7 @@ public class MyMusicService extends Service {
     @TargetApi(24)
     public void onDestroy()
     {   super.onDestroy();
-
-       stopSelf();
+        stopSelf();
        stopForeground(STOP_FOREGROUND_REMOVE);
 
     }

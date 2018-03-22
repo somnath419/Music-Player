@@ -56,9 +56,8 @@ public class AllSongsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView ( LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState ) {
         View v = inflater.inflate(R.layout.allsong_mainview, container, false);
-
 
         progressBar=(ProgressBar) v.findViewById(R.id.progressbar);
         list = (ListView) v.findViewById(R.id.list_item);
@@ -139,7 +138,6 @@ public class AllSongsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     mBoundService.storeTracklist(songs);
-
                     Intent intent = new Intent(getActivity(), NowPlayingActivity.class);
                     intent.putExtra("from_allsong", 1);
                     intent.putExtra("songname", currSong.getTitle());

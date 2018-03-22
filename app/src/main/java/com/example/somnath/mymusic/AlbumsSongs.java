@@ -91,7 +91,6 @@ public class AlbumsSongs extends AppCompatActivity {
 
         new List_All_Songs(context).execute();
 
-        Toast.makeText(context, album_image, Toast.LENGTH_SHORT).show();
 
     }
 
@@ -249,6 +248,8 @@ public class AlbumsSongs extends AppCompatActivity {
                         intent.putExtra("songimage",currSong.getImg_Id());
                         context.startActivity(intent);
                         mBoundService.playTrack(position);
+                        mBoundService.CustomNotification();
+                        mBoundService.updateNotification();
 
                     }
                 });

@@ -101,6 +101,8 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
         super.onListItemClick(l, v, position, id);
 
         mBoundService.playTrack(position);
+        mBoundService.CustomNotification();
+        mBoundService.updateNotification();
 
 
     }

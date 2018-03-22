@@ -20,8 +20,6 @@ import android.widget.Toast;
 import com.example.somnath.mymusic.AlbumsSongs;
 import com.example.somnath.mymusic.R;
 import com.example.somnath.mymusic.Song;
-
-import java.net.Inet4Address;
 import java.util.ArrayList;
 
 
