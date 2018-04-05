@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class PlayingListFragment extends ListFragment implements OnItemClickListener {
+public class PlayingListActivity extends AppCompatActivity{
 
 
     private MyMusicService mBoundService;
@@ -49,68 +50,40 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
     };
 
     @Override
-    @TargetApi(23)
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        context=getContext();
         doBindService();
+        setContentView(R.layout.nowplayinglist);
 
-        Bundle args = getArguments();
-        if (args != null) {
-            arrayList1 = args.getStringArrayList("index");
-            position=args.getInt("position");
+        context=getApplicationContext();
 
-        }
+        listView=(ListView) findViewById(R.id.listsong);
 
-    }
+        Intent intent = getIntent();
+        Bundle args = intent.getBundleExtra("BUNDLE");
+        arrayList1 = (ArrayList<String>) args.getSerializable("index");
+        position=args.getInt("position");
 
-    @Override
-    public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
+        ArrayAdapter<String> arrayAdapter=new ArrayAdapter<String>(context,
+                android.R.layout.simple_list_item_1,arrayList1);
 
+        listView.setAdapter(arrayAdapter);
 
-        View view = inflater.inflate(R.layout.playing_list_fragment, container, false);
-
-        listView=view.findViewById(android.R.id.list);
-
-
-        ArrayAdapter<String> arrayAdapter =
-                new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1, arrayList1);
-        setListAdapter(arrayAdapter);
-        timerDelayRunForScroll(100,position);
-
-
-
-        return view;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
+        listView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mBoundService.playTrack((int)l);
+                mBoundService.CustomNotification();
+                mBoundService.updateNotification();
+            }
+        });
 
     }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
-        Toast.makeText(getActivity(), "Item: " + position, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        // TODO Auto-generated method stub
-        super.onListItemClick(l, v, position, id);
-
-        mBoundService.playTrack(position);
-        mBoundService.CustomNotification();
-        mBoundService.updateNotification();
-
-
-    }
-
 
     private void doBindService()
-    {   Intent i = new Intent(getActivity(), MyMusicService.class);
-        getActivity().bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+    {   Intent i = new Intent(this, MyMusicService.class);
+        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
     }
 
@@ -118,7 +91,7 @@ public class PlayingListFragment extends ListFragment implements OnItemClickList
     {
         if (mIsBound)
         {   // Detach our existing connection.
-            getActivity().unbindService(mConnection);
+            unbindService(mConnection);
             mIsBound = false;
         }
     }

@@ -28,12 +28,12 @@ import java.util.ArrayList;
 public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarChangeListener {
 
     private Context context;
-    private  static MyMusicService mBoundService;
+    private static MyMusicService mBoundService;
     private boolean mIsBound = false;
     private SeekBar seekBar1;
-    private  TextView textView;
+    private TextView textView;
     boolean userTouch;
-    private  ImageButton play,pause,previous,next;
+    private ImageButton play,pause,previous,next;
     private ArrayList<Song> arrayList;
     private ArrayList<String> arrayList1;
     private ArrayList<Song> arraylist_from_other;
@@ -103,29 +103,14 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
             album_icon.setImageBitmap(bm);
             pause.setVisibility(View.VISIBLE);
             play.setVisibility(View.GONE);
-
         }
-
-
 
 
         View nowPlayingList=(View) findViewById(R.id.nowPlayinglist);
 
-        final FrameLayout frameLayout=(FrameLayout)findViewById(R.id.song_list);
-        frameLayout.setVisibility(View.GONE);
-
         nowPlayingList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                frameLayout.setVisibility(View.VISIBLE);
-
-                pause.setVisibility(View.GONE);
-                play.setVisibility(View.GONE);
-                previous.setVisibility(View.GONE);
-                next.setVisibility(View.GONE);
-                album_icon.setVisibility(View.GONE);
-                name_song.setVisibility(View.GONE);
-                seekBar1.setVisibility(View.GONE);
 
                 arrayList=mBoundService.getTracklist();
                 arrayList1=new ArrayList<String>();
@@ -134,17 +119,18 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
 
                 int pos=mBoundService.getCurrentTrackPosition();
 
-                PlayingListFragment playingListFragment=new PlayingListFragment();
+                Intent intent=new Intent(context,PlayingListActivity.class);
                 Bundle args = new Bundle();
                 args.putSerializable("index", arrayList1);
                 args.putInt("position",pos);
-                playingListFragment.setArguments(args);
+                intent.putExtra("BUNDLE",args);
 
-                getFragmentManager().beginTransaction().replace(R.id.song_list,playingListFragment).commit();
+                startActivity(intent);
+
             }
         });
 
-        //play or pause button
+        //play
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -195,6 +181,8 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
                 if( mBoundService.getTracklist().size()>0)
                 {
                     mBoundService.nextTrack();
+                    mBoundService.CustomNotification();
+                    mBoundService.updateNotification();
                     pause.setVisibility(View.VISIBLE);
                     play.setVisibility(View.GONE);
 
@@ -219,7 +207,9 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
 
                 if(mBoundService!=null && mBoundService.getTracklist().size()>0)
                 {
-                mBoundService.prevTrack();
+                    mBoundService.prevTrack();
+                    mBoundService.CustomNotification();
+                    mBoundService.updateNotification();
                 pause.setVisibility(View.VISIBLE);
                 play.setVisibility(View.GONE);
 

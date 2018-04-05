@@ -116,6 +116,17 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".PlayingListActivity"
+            android:label="Playing List"
+            android:launchMode="singleTop"
+            android:parentActivityName=".NowPlayingActivity"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".MyMusicService"
             android:enabled="true"

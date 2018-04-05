@@ -41,7 +41,7 @@ public class MyMusicService extends Service {
     private boolean taken;
     private IBinder playerBinder;
     private Context context;
-    SharedPreferences sharedpreferences;
+    private SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
     private static final int NOTIF_ID = 1234;
     private NotificationCompat.Builder mBuilder;
@@ -50,16 +50,13 @@ public class MyMusicService extends Service {
     private Notification mNotification;
 
     public class LocalBinder extends Binder
-    {    public MyMusicService getService() {
-
-            return MyMusicService.this;
+    {     public MyMusicService getService() {
+                    return MyMusicService.this;
         }
     }
 
-
     @Override
     public void onCreate() {
-
         super.onCreate();
         context=this;
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
@@ -79,9 +76,6 @@ public class MyMusicService extends Service {
                 }
             }
         });
-
-
-
         restoreTracklist();
     }
 
@@ -332,8 +326,7 @@ public class MyMusicService extends Service {
     }
 
     public MediaPlayer mediaPlayer()
-    {
-        return  mediaPlayer;
+    {   return  mediaPlayer;
     }
 
     public void storeTracklist(ArrayList<Song> tracklist) {
@@ -397,7 +390,7 @@ public class MyMusicService extends Service {
         Intent previousclick = new Intent("previous");
         Intent nextclick = new Intent("next");
         Intent play = new Intent("play");
-        Intent pause = new Intent("stop");
+        Intent pause = new Intent("pause");
         Intent clear=new Intent("clear");
 
 

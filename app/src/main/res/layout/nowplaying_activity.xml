@@ -16,18 +16,10 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <FrameLayout
-        android:id="@+id/song_list"
-        android:layout_below="@id/nowPlayinglist"
+
+
+    <ImageView
         android:layout_width="fill_parent"
-        android:layout_height="match_parent">
-
-
-
-
-    </FrameLayout>
-
-    <ImageView android:layout_width="fill_parent"
         android:layout_height="300sp"
         android:layout_below="@id/nowPlaying_toolbar"
         android:id="@+id/song_icon"
