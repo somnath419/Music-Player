@@ -79,6 +79,8 @@ public class PlayingListActivity extends AppCompatActivity{
             }
         });
 
+        timerDelayRunForScroll(100,position);
+
     }
 
     private void doBindService()

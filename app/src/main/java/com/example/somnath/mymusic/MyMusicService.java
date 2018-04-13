@@ -71,8 +71,10 @@ public class MyMusicService extends Service {
             public void onCompletion(MediaPlayer arg0) {
                 if (currentTrackPosition == tracklist.size()-1) {
                     playTrack(0);
+
                 } else {
                     nextTrack();
+                    updateNotification();
                 }
             }
         });

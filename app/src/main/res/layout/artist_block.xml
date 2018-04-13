@@ -2,32 +2,22 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:background="@color/colordont"
     android:layout_height="wrap_content">
 
 
-    <View
-        android:layout_width="20sp"
-        android:layout_height="30sp"
-        android:id="@+id/space"
-        android:background="@color/colorwhite" />
 
     <TextView
         android:id="@+id/name_artist"
         android:layout_width="match_parent"
         android:textSize="25sp"
+        android:paddingLeft="20sp"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorblack"
+        android:textColor="@color/colorwhite"
         android:maxLines="1"
-        android:layout_toEndOf="@+id/space"
-        android:layout_toRightOf="@+id/space"
+
         />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="10sp"
-        android:id="@+id/space2"
-        android:layout_below="@id/name_artist"
-        android:background="@color/colorwhite" />
 
 
 

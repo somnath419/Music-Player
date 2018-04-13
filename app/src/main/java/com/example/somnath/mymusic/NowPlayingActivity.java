@@ -138,6 +138,8 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
                 if(mBoundService!=null && mBoundService.getTracklist().size()>0)
                 {
                 mBoundService.play();
+                mBoundService.CustomNotification();
+                mBoundService.updateNotification();
                 pause.setVisibility(View.VISIBLE);
                 play.setVisibility(View.GONE);
                     arrayList=mBoundService.getTracklist();
@@ -162,6 +164,8 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
                 if(mBoundService!=null && mBoundService.getTracklist().size()>0)
                 {
                 mBoundService.play();
+                mBoundService.CustomNotification();
+                mBoundService.updateNotification();
                 pause.setVisibility(View.GONE);
                 play.setVisibility(View.VISIBLE);
                     arrayList=mBoundService.getTracklist();
