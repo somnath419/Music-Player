@@ -113,7 +113,7 @@ public class ArtistsFragment extends Fragment{
         }
 
 
-        public void getArtistsList() {
+        private void getArtistsList() {
 
                 ContentResolver musicResolver = getActivity().getContentResolver();
 

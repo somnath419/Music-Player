@@ -66,12 +66,19 @@
 
     <SeekBar
         android:id="@+id/seekBar1"
-        android:layout_width="match_parent"
+        android:layout_width="300sp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
        />
 
+   <TextView
+       android:id="@+id/duration"
+       android:layout_height="wrap_content"
+       android:layout_width="wrap_content"
+       android:text="5:20"
+       android:layout_toEndOf="@+id/seekBar1"
+       android:layout_toRightOf="@+id/seekBar1"/>
 
     <ImageButton
         android:id="@+id/previous"

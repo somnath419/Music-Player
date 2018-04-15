@@ -12,7 +12,7 @@ public class Song {
     private String a_lbums;
     private String genre_s;
     private String albumart;
-    private int Dduration;
+    private String Dduration;
     private String img_Id;
     private int date_added;
     private long album_ID;
@@ -74,6 +74,15 @@ public class Song {
         date_added=date_Added;
     }
 
+    public Song(long id, String songTitle,String artist,String art_album,int date_Added,String duration) {
+        Id =id;
+        title=songTitle;
+        Artist=artist;
+        img_Id=art_album;
+        date_added=date_Added;
+        Dduration=duration;
+    }
+
     public Song(long id, String songTitle,String artist,int date_Added) {
         Id =id;
         title=songTitle;
@@ -90,10 +99,11 @@ public class Song {
     public long getId(){return Id;}
     public String getGenres(){return genre_s;}
     public  String getAlbumart(){return  albumart;}
-    public  int getDduration(){return Dduration;}
+    public String getDduration(){return Dduration;}
     public String getImg_Id(){return img_Id;}
     public int getDate_added(){return date_added;}
     public long getAlbum_ID(){ return album_ID;}
+
 
 
 

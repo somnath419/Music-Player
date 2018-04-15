@@ -198,7 +198,7 @@ public class AlbumsSongs extends AppCompatActivity {
             private Context context;
 
 
-            public AlbumSongsAdapter(Context c, ArrayList<Song> theSongs) {
+            private AlbumSongsAdapter(Context c, ArrayList<Song> theSongs) {
                 songs = theSongs;
                 songInf = LayoutInflater.from(c);
                 context = c;

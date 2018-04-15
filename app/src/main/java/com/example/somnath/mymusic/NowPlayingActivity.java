@@ -37,7 +37,7 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     private ArrayList<Song> arrayList;
     private ArrayList<String> arrayList1;
     private ArrayList<Song> arraylist_from_other;
-    private TextView name_song ;
+    private TextView name_song ,duration;
     private ImageView album_icon;
     int set_list=0;
     private int curr;
@@ -73,7 +73,9 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         album_icon = (ImageView) findViewById(R.id.song_icon);
         name_song = (TextView) findViewById(R.id.nameofsong);
         seekBar1=(SeekBar) findViewById(R.id.seekBar1);
+        duration=(TextView)findViewById(R.id.duration);
 
+        //taking intent from mainactivity class
         if(getIntent().getIntExtra("empty_list",0)==4)
         {
             Toast.makeText(context, "The list is empty please click on songs to play", Toast.LENGTH_LONG).show();
@@ -93,6 +95,7 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
 
 
 
+        //taking intent message from allsongsfragment
 
         if (getIntent().getIntExtra("from_allsong", 0) == 1) {
             String name_image = getIntent().getStringExtra("songimage");
@@ -115,7 +118,7 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
                 arrayList=mBoundService.getTracklist();
                 arrayList1=new ArrayList<String>();
                 for(int i=0;i<arrayList.size();i++)
-                   arrayList1.add(arrayList.get(i).getTitle());
+                    arrayList1.add(arrayList.get(i).getTitle());
 
                 int pos=mBoundService.getCurrentTrackPosition();
 
@@ -131,107 +134,16 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         });
 
         //play
-        play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        playClick();
 
-                if(mBoundService!=null && mBoundService.getTracklist().size()>0)
-                {
-                mBoundService.play();
-                mBoundService.CustomNotification();
-                mBoundService.updateNotification();
-                pause.setVisibility(View.VISIBLE);
-                play.setVisibility(View.GONE);
-                    arrayList=mBoundService.getTracklist();
-                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-                    Bitmap bm= BitmapFactory.decodeFile(image);
-                    album_icon.setImageBitmap(bm);
-                    name_song.setText(name);
-                }
-                else
-                {
-                    Toast.makeText(context, "The list is empty please click on songs to play ", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(context,MainActivity.class));
-
-                }
-            }
-        });
-
-        pause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mBoundService!=null && mBoundService.getTracklist().size()>0)
-                {
-                mBoundService.play();
-                mBoundService.CustomNotification();
-                mBoundService.updateNotification();
-                pause.setVisibility(View.GONE);
-                play.setVisibility(View.VISIBLE);
-                    arrayList=mBoundService.getTracklist();
-                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-                    Bitmap bm= BitmapFactory.decodeFile(image);
-                    album_icon.setImageBitmap(bm);
-                    name_song.setText(name);
-                }
-            }
-        });
+        //pauseclick
+        pauseClick();
 
         //play next song
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v){
-                if( mBoundService.getTracklist().size()>0)
-                {
-                    mBoundService.nextTrack();
-                    mBoundService.CustomNotification();
-                    mBoundService.updateNotification();
-                    pause.setVisibility(View.VISIBLE);
-                    play.setVisibility(View.GONE);
-
-                    arrayList=mBoundService.getTracklist();
-                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-                    Bitmap bm= BitmapFactory.decodeFile(image);
-                    album_icon.setImageBitmap(bm);
-                    name_song.setText(name);
-                }
-                else {
-                    Toast.makeText(context, "The list is empty please click on songs to play ", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(context,MainActivity.class));
-                }
-            }
-        });
+        nextSong();
 
         //play previous song
-        previous.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if(mBoundService!=null && mBoundService.getTracklist().size()>0)
-                {
-                    mBoundService.prevTrack();
-                    mBoundService.CustomNotification();
-                    mBoundService.updateNotification();
-                pause.setVisibility(View.VISIBLE);
-                play.setVisibility(View.GONE);
-
-                arrayList=mBoundService.getTracklist();
-                String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-                name_song.setText(name);
-                String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-                Bitmap bm= BitmapFactory.decodeFile(image);
-                album_icon.setImageBitmap(bm);
-
-                }
-                else
-                {
-                    Toast.makeText(context, "The list is empty please click on songs to play ", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(context,MainActivity.class));
-                }
-            }
-        });
+        previousSong();
 
     }
 
@@ -291,33 +203,33 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     protected void onResume()
     {   super.onResume();
 
-      if(mBoundService!=null) {
+        if(mBoundService!=null) {
 
-          if(mBoundService.getTracklist().size()>0) {
-              arrayList = mBoundService.getTracklist();
-              String name = arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-              name_song.setText(name);
+            if(mBoundService.getTracklist().size()>0) {
+                arrayList = mBoundService.getTracklist();
+                String name = arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
+                name_song.setText(name);
+                duration.setText(secondsToString(mBoundService.getCurrentTrackDuration()));
 
-              String image = arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-              Bitmap bm = BitmapFactory.decodeFile(image);
-              album_icon.setImageBitmap(bm);
-              name_song.setText(name);
 
-              if (mBoundService.getStatus() == 1) {
-                  play.setVisibility(View.GONE);
-                  pause.setVisibility(View.VISIBLE);
-              } else {
-                  pause.setVisibility(View.GONE);
-                  play.setVisibility(View.VISIBLE);
-              }
-          }
+                String image = arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
+                Bitmap bm = BitmapFactory.decodeFile(image);
+                album_icon.setImageBitmap(bm);
+                name_song.setText(name);
 
-      }
+                if (mBoundService.getStatus() == 1) {
+                    play.setVisibility(View.GONE);
+                    pause.setVisibility(View.VISIBLE);
+                } else {
+                    pause.setVisibility(View.GONE);
+                    play.setVisibility(View.VISIBLE);
+                }
+            }
+
+        }
 
         seekBar1.setOnSeekBarChangeListener(this);
-      updateProgressBar();
-
-
+        updateProgressBar();
 
     }
 
@@ -370,6 +282,128 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         // return current duration in milliseconds
         return currentDuration * 1000;
     }
+
+    private void nextSong()
+    {
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                if( mBoundService.getTracklist().size()>0)
+                {
+                    mBoundService.nextTrack();
+                    mBoundService.CustomNotification();
+                    mBoundService.updateNotification();
+                    pause.setVisibility(View.VISIBLE);
+                    play.setVisibility(View.GONE);
+
+                    arrayList=mBoundService.getTracklist();
+                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
+                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
+                    Bitmap bm= BitmapFactory.decodeFile(image);
+                    album_icon.setImageBitmap(bm);
+                    name_song.setText(name);
+                }
+                else {
+                    Toast.makeText(context, "The list is empty please click on songs to play ", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(context,MainActivity.class));
+                }
+            }
+        });
+    }
+
+    private void previousSong()
+    {
+        previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(mBoundService!=null && mBoundService.getTracklist().size()>0)
+                {
+                    mBoundService.prevTrack();
+                    mBoundService.CustomNotification();
+                    mBoundService.updateNotification();
+                    pause.setVisibility(View.VISIBLE);
+                    play.setVisibility(View.GONE);
+
+                    arrayList=mBoundService.getTracklist();
+                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
+                    name_song.setText(name);
+                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
+                    Bitmap bm= BitmapFactory.decodeFile(image);
+                    album_icon.setImageBitmap(bm);
+
+                }
+                else
+                {
+                    Toast.makeText(context, "The list is empty please click on songs to play ", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(context,MainActivity.class));
+                }
+            }
+        });
+    }
+
+    private void playClick()
+    {
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(mBoundService!=null && mBoundService.getTracklist().size()>0)
+                {
+                    mBoundService.play();
+                    mBoundService.CustomNotification();
+                    mBoundService.updateNotification();
+                    pause.setVisibility(View.VISIBLE);
+                    play.setVisibility(View.GONE);
+                    arrayList=mBoundService.getTracklist();
+                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
+                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
+                    Bitmap bm= BitmapFactory.decodeFile(image);
+                    album_icon.setImageBitmap(bm);
+                    name_song.setText(name);
+
+                    Toast.makeText(context,String.valueOf(mBoundService.getCurrentTrackDuration()),Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(context, "The list is empty please click on songs to play ", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(context,MainActivity.class));
+
+                }
+            }
+        });
+    }
+
+    private void pauseClick()
+    {
+        pause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mBoundService!=null && mBoundService.getTracklist().size()>0)
+                {
+                    mBoundService.play();
+                    mBoundService.CustomNotification();
+                    mBoundService.updateNotification();
+                    pause.setVisibility(View.GONE);
+                    play.setVisibility(View.VISIBLE);
+                    arrayList=mBoundService.getTracklist();
+                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
+                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
+                    Bitmap bm= BitmapFactory.decodeFile(image);
+                    album_icon.setImageBitmap(bm);
+                    name_song.setText(name);
+                }
+            }
+        });
+
+    }
+
+
+    // convert seconds to string format
+    private String secondsToString(int pTime) {
+        return String.format("%02d:%02d", pTime / 60000, pTime % 600);
+    }
+
 
     @Override
     public void onDestroy()

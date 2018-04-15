@@ -51,8 +51,8 @@ public class MyMusicService extends Service {
 
     public class LocalBinder extends Binder
     {     public MyMusicService getService() {
-                    return MyMusicService.this;
-        }
+        return MyMusicService.this;
+    }
     }
 
     @Override
@@ -106,28 +106,24 @@ public class MyMusicService extends Service {
                 {
                     case "play":
                         play();
-                        CustomNotification();
                         updateNotification();
                         break;
                     case "pause":
                         play();
-                        CustomNotification();
                         updateNotification();
                         break;
                     case "next":
                         nextTrack();
-                        CustomNotification();
                         updateNotification();
                         break;
                     case "previous":
                         prevTrack();
-                        CustomNotification();
                         updateNotification();
                         break;
                     case "clear":
+                        pause();
+                        mNotificationManager.cancel(NOTIF_ID);
                         stopForeground(true);
-                        stop();
-                        stopService(new Intent(context,MyMusicService.class));
                         break;
                 }
             }
@@ -223,6 +219,7 @@ public class MyMusicService extends Service {
         untake();
     }
 
+    //play using position in list using song_id
     public void playTrack(int pos) {
         if (status > STOPED) {
             stop();
@@ -255,10 +252,8 @@ public class MyMusicService extends Service {
         untake();
     }
 
-    public void play(int pos) {
-        playTrack(pos);
-    }
 
+    //play according to status
     public void play() {
         switch (status) {
             case STOPED:
@@ -320,6 +315,11 @@ public class MyMusicService extends Service {
         }
     }
 
+    public String getTrackDurationFromList()
+    {
+        return tracklist.get(getCurrentTrackPosition()).getDduration();
+    }
+
     public void seekTrack(int p) {
         if (status > STOPED) {
             mediaPlayer.seekTo(p);
@@ -369,7 +369,7 @@ public class MyMusicService extends Service {
 
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-         mRemoteviews = new RemoteViews(getPackageName(),R.layout.notification_view);
+        mRemoteviews = new RemoteViews(getPackageName(),R.layout.notification_view);
         // Open NotificationView Class on Notification Click
         Intent intent = new Intent(this,MainActivity.class);
 
@@ -377,12 +377,12 @@ public class MyMusicService extends Service {
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-         mBuilder = new NotificationCompat.Builder(this)
+        mBuilder = new NotificationCompat.Builder(this)
                 // Set Icon
                 .setSmallIcon(R.drawable.ic_play_circle_outline_black_24dp)
                 .setContentTitle("Now Playing")                // Set Ticker Message
                 // Dismiss Notification
-                .setAutoCancel(false)
+                .setAutoCancel(true)
                 // Set PendingIntent into Notification
                 .setContentIntent(pIntent)
                 // Set mRemoteviews into Notification
@@ -412,6 +412,7 @@ public class MyMusicService extends Service {
 
         mRemoteviews.setViewVisibility(R.id.playPause_not,View.GONE);
 
+
         startForeground(NOTIF_ID,mBuilder.build());
 
     }
@@ -421,9 +422,12 @@ public class MyMusicService extends Service {
     {
         int api = Build.VERSION.SDK_INT;
 
-        if(getTracklist().size()>0)
-        mRemoteviews.setTextViewText(R.id.notification_title,getTracklist().get(getCurrentTrackPosition()).getTitle());
+        if(getTracklist().size()>0) {
 
+
+            mRemoteviews.setTextViewText(R.id.notification_title, getTracklist().get(getCurrentTrackPosition()).getTitle());
+
+        }
         if (api < Build.VERSION_CODES.HONEYCOMB) {
             mNotificationManager.notify(NOTIF_ID, mNotification);
         }else if (api >= Build.VERSION_CODES.HONEYCOMB) {
@@ -436,10 +440,10 @@ public class MyMusicService extends Service {
             mRemoteviews.setViewVisibility(R.id.playPause_not,View.GONE);
         }
         else
-            {
-                mRemoteviews.setViewVisibility(R.id.pause_noti, View.GONE);
-                mRemoteviews.setViewVisibility(R.id.playPause_not,View.VISIBLE);
-            }
+        {
+            mRemoteviews.setViewVisibility(R.id.pause_noti, View.GONE);
+            mRemoteviews.setViewVisibility(R.id.playPause_not,View.VISIBLE);
+        }
 
 
     }
@@ -449,7 +453,7 @@ public class MyMusicService extends Service {
     public void onDestroy()
     {   super.onDestroy();
         stopSelf();
-       stopForeground(STOP_FOREGROUND_REMOVE);
+        stopForeground(STOP_FOREGROUND_REMOVE);
 
     }
 

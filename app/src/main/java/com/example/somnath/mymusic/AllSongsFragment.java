@@ -96,7 +96,7 @@ public class AllSongsFragment extends Fragment {
         private Context context;
 
 
-        public SongAdapter(Context c, ArrayList<Song> theSongs) {
+        private SongAdapter(Context c, ArrayList<Song> theSongs) {
             songs = theSongs;
             songInf = LayoutInflater.from(c);
             context = c;
@@ -233,6 +233,7 @@ public class AllSongsFragment extends Fragment {
                     long id_album = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
                     String artists = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
                     int getAdded=cursorAudio.getInt(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED));
+                    String duration=cursorAudio.getString(cursorAudio.getColumnIndex(MediaStore.Audio.Media.DURATION));
 
                     Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                             new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART, MediaStore.Audio.Albums.ALBUM},
@@ -241,14 +242,14 @@ public class AllSongsFragment extends Fragment {
                     if (cursor.moveToFirst()) {
                         String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
                         // do whatever you need to do
-                        songList.add(new Song(id, tiitle, artists, path,getAdded));
+                        songList.add(new Song(id, tiitle, artists, path,getAdded,duration));
                     }
                 }
                 while (cursorAudio.moveToNext());
             }
         }
 
-      public void getTopRecentAdded(ArrayList<Song> list) {
+      private void getTopRecentAdded(ArrayList<Song> list) {
           Collections.sort(list, new Comparator<Song>() {
               @Override
               public int compare(Song left, Song right) {
