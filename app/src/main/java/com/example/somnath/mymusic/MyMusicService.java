@@ -410,7 +410,7 @@ public class MyMusicService extends Service {
         mRemoteviews.setOnClickPendingIntent(R.id.pause_noti,Pause);
         mRemoteviews.setOnClickPendingIntent(R.id.clear_not,Clear);
 
-        mRemoteviews.setViewVisibility(R.id.playPause_not,View.GONE);
+        mRemoteviews.setViewVisibility(R.id.pause_noti,View.GONE);
 
 
         startForeground(NOTIF_ID,mBuilder.build());
@@ -428,11 +428,6 @@ public class MyMusicService extends Service {
             mRemoteviews.setTextViewText(R.id.notification_title, getTracklist().get(getCurrentTrackPosition()).getTitle());
 
         }
-        if (api < Build.VERSION_CODES.HONEYCOMB) {
-            mNotificationManager.notify(NOTIF_ID, mNotification);
-        }else if (api >= Build.VERSION_CODES.HONEYCOMB) {
-            mNotificationManager.notify(NOTIF_ID, mBuilder.build());
-        }
 
         if(getStatus()==1)
         {
@@ -440,10 +435,18 @@ public class MyMusicService extends Service {
             mRemoteviews.setViewVisibility(R.id.playPause_not,View.GONE);
         }
         else
-        {
+            {
             mRemoteviews.setViewVisibility(R.id.pause_noti, View.GONE);
             mRemoteviews.setViewVisibility(R.id.playPause_not,View.VISIBLE);
         }
+
+        if (api < Build.VERSION_CODES.HONEYCOMB) {
+            mNotificationManager.notify(NOTIF_ID, mNotification);
+        }else if (api >= Build.VERSION_CODES.HONEYCOMB) {
+            mNotificationManager.notify(NOTIF_ID, mBuilder.build());
+        }
+
+
 
 
     }

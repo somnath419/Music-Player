@@ -283,6 +283,7 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         return currentDuration * 1000;
     }
 
+    //next button click
     private void nextSong()
     {
         next.setOnClickListener(new View.OnClickListener() {
@@ -311,6 +312,7 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         });
     }
 
+    //previous button click
     private void previousSong()
     {
         previous.setOnClickListener(new View.OnClickListener() {
@@ -342,6 +344,7 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         });
     }
 
+    //play button click
     private void playClick()
     {
         play.setOnClickListener(new View.OnClickListener() {
