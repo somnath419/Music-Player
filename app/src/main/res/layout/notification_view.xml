@@ -1,86 +1,89 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="80sp"
+        android:layout_height="100sp"
+        android:id="@+id/image_noti"
+        android:contentDescription="image_notification"/>
 
 
-   <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/notification_title"
-       android:maxLines="1"
-       android:textSize="20sp"
-       android:text="Hello"
-       />
 
- <RelativeLayout android:id="@+id/lin"
-     android:layout_height="wrap_content"
-     android:layout_marginTop="10sp"
-     android:layout_width="match_parent"
-     android:layout_below="@+id/notification_title"
-    >
-
-    <ImageButton
-        android:id="@+id/previous_not"
-        android:layout_height="60sp"
-        android:layout_width="60sp"
-        android:background="@drawable/ic_skip_previous_black_24dp"
-        />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:id="@+id/noti_upper"
+            android:layout_toEndOf="@+id/image_noti">
 
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:id="@+id/plaY_pause"
-        android:layout_toEndOf="@+id/previous_not"
-        android:layout_toRightOf="@+id/previous_not"
-        android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/notification_title"
+                android:layout_width="220sp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10sp"
+                android:maxLines="1"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:id="@+id/clear_not"
+                android:layout_width="40sp"
+                android:layout_height="40sp"
+                android:layout_marginStart="10sp"
+                android:layout_gravity="left"
+                android:background="@drawable/ic_clear_black_24dp"
+                android:contentDescription="Close" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lin"
+            android:layout_width="250sp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/noti_upper"
+            android:layout_toEndOf="@+id/image_noti"
+
+            >
+
+            <ImageButton
+                android:id="@+id/previous_not"
+                android:layout_width="60sp"
+                android:layout_height="60sp"
+                android:background="@drawable/ic_skip_previous_black_24dp" />
 
 
-    <ImageButton
-        android:id="@+id/playPause_not"
-        android:layout_height="60sp"
-        android:layout_width="60sp"
-        android:layout_marginStart="30sp"
-        android:layout_marginLeft="30sp"
-        android:layout_toEndOf="@id/previous_not"
-        android:layout_toRightOf="@+id/previous_not"
-        android:background="@drawable/ic_play_circle_outline_black_24dp"
-        />
+            <LinearLayout
+                android:id="@+id/plaY_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-    <ImageButton
-        android:id="@+id/pause_noti"
-        android:layout_height="60sp"
-        android:layout_width="60sp"
-        android:layout_marginStart="30sp"
-        android:layout_marginLeft="30sp"
-        android:layout_toEndOf="@id/previous_not"
-        android:layout_toRightOf="@+id/previous_not"
-        android:background="@drawable/ic_pause_circle_outline_black_24dp"
-        />
 
-    </LinearLayout>
+                <ImageButton
+                    android:id="@+id/playPause_not"
+                    android:layout_width="60sp"
+                    android:layout_height="60sp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_play_circle_outline_black_24dp"
+                    android:padding="20sp" />
 
-    <ImageButton
-        android:id="@+id/next_not"
-        android:layout_height="60sp"
-        android:layout_width="60sp"
-        android:background="@drawable/ic_skip_next_black_24dp"
-        android:layout_toEndOf="@id/plaY_pause"
-        android:layout_toRightOf="@+id/plaY_pause"
-        android:layout_marginStart="20sp"
-        android:layout_marginLeft="20sp"
-        />
-    </RelativeLayout>
+                <ImageButton
+                    android:id="@+id/pause_noti"
+                    android:layout_width="60sp"
+                    android:layout_height="60sp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_pause_circle_outline_black_24dp"
+                    android:padding="20sp" />
 
-    <ImageButton
-        android:id="@+id/clear_not"
-        android:layout_height="60sp"
-        android:layout_width="60sp"
-        android:background="@drawable/ic_clear_black_24dp"
-        android:layout_marginStart="290dp"
-        android:layout_marginLeft="290dp"
+            </LinearLayout>
 
-        />
+            <ImageButton
+                android:id="@+id/next_not"
+                android:layout_width="60sp"
+                android:layout_height="60sp"
+                android:background="@drawable/ic_skip_next_black_24dp" />
+        </LinearLayout>
+
 
 
 </RelativeLayout>

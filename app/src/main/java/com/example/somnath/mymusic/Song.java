@@ -18,12 +18,14 @@ public class Song {
     private long album_ID;
 
 
-    public Song(long id, String artist,String songTitle,String albums,String genres) {
+    public Song(long id, String songTitle,String artist,String img,String genres,String albums) {
         Id =id;
         title=songTitle;
         Artist=artist;
         a_lbums=albums;
         genre_s=genres;
+        img_Id=img;
+
     }
 
     public  Song (long id ,String titl)
@@ -59,11 +61,13 @@ public class Song {
 
 
 
-    public Song(long id, String songTitle,String artist,String art_album) {
+    public Song(long id, String songTitle,String artist,String art_album,String albums) {
         Id =id;
         title=songTitle;
         Artist=artist;
         img_Id=art_album;
+        a_lbums=albums;
+
     }
 
     public Song(long id, String songTitle,String artist,String art_album,int date_Added) {
@@ -74,13 +78,14 @@ public class Song {
         date_added=date_Added;
     }
 
-    public Song(long id, String songTitle,String artist,String art_album,int date_Added,String duration) {
+    public Song(long id, String songTitle,String artist,String art_album,int date_Added,String duration,String albums) {
         Id =id;
         title=songTitle;
         Artist=artist;
         img_Id=art_album;
         date_added=date_Added;
         Dduration=duration;
+        a_lbums=albums;
     }
 
     public Song(long id, String songTitle,String artist,int date_Added) {

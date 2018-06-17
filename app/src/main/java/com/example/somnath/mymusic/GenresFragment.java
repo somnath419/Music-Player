@@ -35,7 +35,7 @@ public class GenresFragment extends Fragment {
     private ListView list;
     private MyMusicService mBoundService;
     private Context context;
-    private boolean mIsBound,flag_cancel;
+    private boolean mIsBound, flag_cancel;
     private ProgressBar progressBar;
 
     //mconnection
@@ -64,13 +64,12 @@ public class GenresFragment extends Fragment {
 
 
         list = (ListView) v.findViewById(R.id.list_item);
-        progressBar=(ProgressBar)v.findViewById(R.id.progressbar);
+        progressBar = (ProgressBar) v.findViewById(R.id.progressbar);
         songList = new ArrayList<Song>();
         progressBar.setVisibility(View.VISIBLE);
 
 
         new List_All_Genres(context).execute();
-
 
 
         return v;
@@ -199,7 +198,7 @@ public class GenresFragment extends Fragment {
         protected void onPostExecute(ArrayList<Song> c) {
             super.onPostExecute(c);
 
-            if(songList != null) {
+            if (songList != null) {
 
                 SongAdapter songAdt = new SongAdapter(getContext(), songList);
                 list.setAdapter(songAdt);
@@ -210,7 +209,7 @@ public class GenresFragment extends Fragment {
 
 
         public void getGenreList() {
-             Cursor mediaCursor;
+            Cursor mediaCursor;
             Cursor genresCursor;
 
             String[] mediaProjection = {
@@ -219,7 +218,7 @@ public class GenresFragment extends Fragment {
                     MediaStore.Audio.Media.ALBUM,
                     MediaStore.Audio.Media.TITLE
             };
-             String[] genresProjection = {
+            String[] genresProjection = {
                     MediaStore.Audio.Genres.NAME,
                     MediaStore.Audio.Genres._ID
             };
@@ -248,10 +247,9 @@ public class GenresFragment extends Fragment {
 
                     if (genresCursor.moveToFirst()) {
 
-                            String genre= genresCursor.getString(genre_column_index);
+                        String genre = genresCursor.getString(genre_column_index);
 
-                            songList.add(new Song(genre));
-
+                        songList.add(new Song(genre));
 
 
                     }

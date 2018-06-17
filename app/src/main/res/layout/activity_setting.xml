@@ -7,7 +7,6 @@
 <ListView
     android:layout_width="match_parent"
      android:id="@+id/list"
-    android:divider="@drawable/common_full_open_on_phone"
     android:dividerHeight="2dp"
     android:layout_height="match_parent">
 

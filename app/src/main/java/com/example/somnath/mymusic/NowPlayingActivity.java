@@ -1,19 +1,23 @@
 package com.example.somnath.mymusic;
 
 
+
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -33,38 +37,55 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     private SeekBar seekBar1;
     private TextView textView;
     boolean userTouch;
-    private ImageButton play,pause,previous,next;
+    private ImageButton play, pause, previous, next;
     private ArrayList<Song> arrayList;
     private ArrayList<String> arrayList1;
     private ArrayList<Song> arraylist_from_other;
-    private TextView name_song ,duration;
+    private TextView name_song, duration;
     private ImageView album_icon;
-    int set_list=0;
+    private Toolbar toolbar;
+    int set_list = 0;
     private int curr;
-    private Handler mHandler = new Handler();;
+    private Handler mHandler = new Handler();
+    private ArrayList<Song> dbsonglist;
+    private int cur_song;
+
 
     //mconnection
-    private  ServiceConnection mConnection = new ServiceConnection()
-    {
-        public void onServiceConnected(ComponentName className, IBinder service)
-        {  mBoundService = ((MyMusicService.LocalBinder) service).getService();
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mBoundService = ((MyMusicService.LocalBinder) service).getService();
         }
-        public void onServiceDisconnected(ComponentName className)
-        {
+
+        public void onServiceDisconnected(ComponentName className) {
 
         }
     };
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.nowplaying_activity);
         doBindService();
 
         context = this;
+        dbsonglist=new ArrayList<Song>();
+
+        toolbar = (Toolbar) findViewById(R.id.nowPlaying_toolbar);
+        toolbar.setTitleTextColor(Color.WHITE);
+
+        toolbar.setTitle("Now Playing");
+        toolbar.setNavigationIcon(R.drawable.outline_chevron_left_white_24dp);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //do something you want
+                onBackPressed();
+            }
+        });
 
         play = (ImageButton) findViewById(R.id.play);
         pause = (ImageButton) findViewById(R.id.pause);
@@ -72,12 +93,11 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         next = (ImageButton) findViewById(R.id.next);
         album_icon = (ImageView) findViewById(R.id.song_icon);
         name_song = (TextView) findViewById(R.id.nameofsong);
-        seekBar1=(SeekBar) findViewById(R.id.seekBar1);
-        duration=(TextView)findViewById(R.id.duration);
+        seekBar1 = (SeekBar) findViewById(R.id.seekBar1);
+        duration = (TextView) findViewById(R.id.duration);
 
         //taking intent from mainactivity class
-        if(getIntent().getIntExtra("empty_list",0)==4)
-        {
+        if (getIntent().getIntExtra("empty_list", 0) == 4) {
             Toast.makeText(context, "The list is empty please click on songs to play", Toast.LENGTH_LONG).show();
             pause.setVisibility(View.GONE);
             play.setVisibility(View.VISIBLE);
@@ -87,12 +107,10 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
             pause.setVisibility(View.VISIBLE);
             play.setVisibility(View.GONE);
 
-        }else
-        {
+        } else {
             pause.setVisibility(View.GONE);
             play.setVisibility(View.VISIBLE);
         }
-
 
 
         //taking intent message from allsongsfragment
@@ -109,24 +127,24 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         }
 
 
-        View nowPlayingList=(View) findViewById(R.id.nowPlayinglist);
+        View nowPlayingList = (View) findViewById(R.id.nowPlayinglist);
 
         nowPlayingList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                arrayList=mBoundService.getTracklist();
-                arrayList1=new ArrayList<String>();
-                for(int i=0;i<arrayList.size();i++)
+                arrayList = mBoundService.getTracklist();
+                arrayList1 = new ArrayList<String>();
+                for (int i = 0; i < arrayList.size(); i++)
                     arrayList1.add(arrayList.get(i).getTitle());
 
-                int pos=mBoundService.getCurrentTrackPosition();
+                int pos = mBoundService.getCurrentTrackPosition();
 
-                Intent intent=new Intent(context,PlayingListActivity.class);
+                Intent intent = new Intent(context, PlayingListActivity.class);
                 Bundle args = new Bundle();
                 args.putSerializable("index", arrayList1);
-                args.putInt("position",pos);
-                intent.putExtra("BUNDLE",args);
+                args.putInt("position", pos);
+                intent.putExtra("BUNDLE", args);
 
                 startActivity(intent);
 
@@ -151,17 +169,21 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     public void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);
     }
+
     // Background Runnable thread
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
 
             long totalDuration = mBoundService.getCurrentTrackDuration();
             long currentDuration = mBoundService.getCurrentTrackProgress();
+            boolean currentstatus=mBoundService.complete;
             // Updating progress bar
-            int progress = (int)(getProgressPercentage(currentDuration, totalDuration));
+            int progress = (int) (getProgressPercentage(currentDuration, totalDuration));
             //Log.d("Progress", ""+progress);
             seekBar1.setProgress(progress);
-
+            if((currentstatus)&&(mBoundService.getCurrentTrackPosition()!= mBoundService.getTracklist().size()-1))
+            { updateUI();
+            }
             // Running this thread after 100 milliseconds
             mHandler.postDelayed(this, 100);
         }
@@ -195,27 +217,62 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     }
 
     @Override
-    protected void onStart()
-    {   super.onStart();
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
-    protected void onResume()
-    {   super.onResume();
+    protected void onResume() {
+        super.onResume();
 
-        if(mBoundService!=null) {
+        DbNowplaying dbOpen = new DbNowplaying(context);
+        SQLiteDatabase db = dbOpen.getReadableDatabase();
+        Cursor c2 = db.query(DbNowplaying.TABLE_NAME, null, null, null, null, null, null);
+        dbsonglist.clear();
 
-            if(mBoundService.getTracklist().size()>0) {
-                arrayList = mBoundService.getTracklist();
-                String name = arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-                name_song.setText(name);
-                duration.setText(secondsToString(mBoundService.getCurrentTrackDuration()));
+        while (c2.moveToNext()) {
+            dbsonglist.add(new Song(c2.getLong(0), c2.getString(1), c2.getString(2), c2.getString(3), c2.getString(4), c2.getString(5)));
+        }
 
 
-                String image = arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-                Bitmap bm = BitmapFactory.decodeFile(image);
-                album_icon.setImageBitmap(bm);
-                name_song.setText(name);
+        c2.close();
+
+
+        if (mBoundService != null)
+            Toast.makeText(context, String.valueOf(mBoundService.getTracklist().size()), Toast.LENGTH_SHORT).show();
+
+        Cursor cursor2 = db.query(DbNowplaying.TABLE2, null, null, null, null, null, null);
+
+        while (cursor2.moveToNext()) {
+            cur_song = cursor2.getInt(1);
+        }
+
+
+        cursor2.close();
+
+        if(dbsonglist.size()>0) {
+
+
+
+            String name = dbsonglist.get(cur_song).getTitle();
+            name_song.setText(name);
+
+            String image = dbsonglist.get(cur_song).getImg_Id();
+            Bitmap bm = BitmapFactory.decodeFile(image);
+            album_icon.setImageBitmap(bm);
+            name_song.setText(name);
+        }
+
+
+        dbOpen.close();
+
+
+
+
+        if (mBoundService != null) {
+
+            if (mBoundService.getTracklist().size() > 0) {
+
 
                 if (mBoundService.getStatus() == 1) {
                     play.setVisibility(View.GONE);
@@ -234,41 +291,37 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
     }
 
     @Override
-    protected void onStop()
-    {
+    protected void onStop() {
         super.onStop();
 
     }
 
-    private void doBindService()
-    {   Intent i = new Intent(NowPlayingActivity.this, MyMusicService.class);
+    private void doBindService() {
+        Intent i = new Intent(NowPlayingActivity.this, MyMusicService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
     }
 
-    private void doUnbindService()
-    {
-        if (mIsBound)
-        {   // Detach our existing connection.
+    private void doUnbindService() {
+        if (mIsBound) {   // Detach our existing connection.
             unbindService(mConnection);
             mIsBound = false;
         }
     }
 
-    public int getProgressPercentage(long currentDuration, long totalDuration){
+    public int getProgressPercentage(long currentDuration, long totalDuration) {
         Double percentage = (double) 0;
 
         long currentSeconds = (int) (currentDuration / 1000);
         long totalSeconds = (int) (totalDuration / 1000);
 
         // calculating percentage
-        percentage =(((double)currentSeconds)/totalSeconds)*100;
+        percentage = (((double) currentSeconds) / totalSeconds) * 100;
 
         // return percentage
         return percentage.intValue();
@@ -284,120 +337,93 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     }
 
     //next button click
-    private void nextSong()
-    {
+    private void nextSong() {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                if( mBoundService.getTracklist().size()>0)
-                {
+            public void onClick(View v) {
+                if (mBoundService.getTracklist().size() > 0) {
                     mBoundService.nextTrack();
-                    mBoundService.CustomNotification();
-                    mBoundService.updateNotification();
+                    updateUI();
                     pause.setVisibility(View.VISIBLE);
                     play.setVisibility(View.GONE);
 
-                    arrayList=mBoundService.getTracklist();
-                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-                    Bitmap bm= BitmapFactory.decodeFile(image);
-                    album_icon.setImageBitmap(bm);
-                    name_song.setText(name);
-                }
-                else {
+                } else {
                     Toast.makeText(context, "The list is empty please click on songs to play ", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(context,MainActivity.class));
+                    startActivity(new Intent(context, MainActivity.class));
                 }
             }
         });
     }
 
     //previous button click
-    private void previousSong()
-    {
+    private void previousSong() {
         previous.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(mBoundService!=null && mBoundService.getTracklist().size()>0)
-                {
+                if (mBoundService != null && mBoundService.getTracklist().size() > 0) {
                     mBoundService.prevTrack();
-                    mBoundService.CustomNotification();
-                    mBoundService.updateNotification();
+                    updateUI();
                     pause.setVisibility(View.VISIBLE);
                     play.setVisibility(View.GONE);
 
-                    arrayList=mBoundService.getTracklist();
-                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-                    name_song.setText(name);
-                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-                    Bitmap bm= BitmapFactory.decodeFile(image);
-                    album_icon.setImageBitmap(bm);
 
-                }
-                else
-                {
+                } else {
                     Toast.makeText(context, "The list is empty please click on songs to play ", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(context,MainActivity.class));
+                    startActivity(new Intent(context, MainActivity.class));
                 }
             }
         });
     }
 
     //play button click
-    private void playClick()
-    {
+    private void playClick() {
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(mBoundService!=null && mBoundService.getTracklist().size()>0)
-                {
+                if (mBoundService != null && mBoundService.getTracklist().size() > 0) {
                     mBoundService.play();
-                    mBoundService.CustomNotification();
-                    mBoundService.updateNotification();
+                    updateUI();
                     pause.setVisibility(View.VISIBLE);
                     play.setVisibility(View.GONE);
-                    arrayList=mBoundService.getTracklist();
-                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-                    Bitmap bm= BitmapFactory.decodeFile(image);
-                    album_icon.setImageBitmap(bm);
-                    name_song.setText(name);
 
-                    Toast.makeText(context,String.valueOf(mBoundService.getCurrentTrackDuration()),Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
+
+                } else {
                     Toast.makeText(context, "The list is empty please click on songs to play ", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(context,MainActivity.class));
+                    startActivity(new Intent(context, MainActivity.class));
 
                 }
             }
         });
     }
 
-    private void pauseClick()
-    {
+    private void pauseClick() {
         pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mBoundService!=null && mBoundService.getTracklist().size()>0)
-                {
+                if (mBoundService != null && mBoundService.getTracklist().size() > 0) {
                     mBoundService.play();
-                    mBoundService.CustomNotification();
-                    mBoundService.updateNotification();
+                    updateUI();
                     pause.setVisibility(View.GONE);
                     play.setVisibility(View.VISIBLE);
-                    arrayList=mBoundService.getTracklist();
-                    String name=arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
-                    String image=arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
-                    Bitmap bm= BitmapFactory.decodeFile(image);
-                    album_icon.setImageBitmap(bm);
-                    name_song.setText(name);
+
                 }
             }
         });
+
+    }
+
+
+    private void updateUI() {
+        mBoundService.CustomNotification();
+        mBoundService.updateNotification();
+        arrayList = mBoundService.getTracklist();
+        String name = arrayList.get(mBoundService.getCurrentTrackPosition()).getTitle();
+        String image = arrayList.get(mBoundService.getCurrentTrackPosition()).getImg_Id();
+        Bitmap bm = BitmapFactory.decodeFile(image);
+        album_icon.setImageBitmap(bm);
+        name_song.setText(name);
 
     }
 
@@ -409,12 +435,14 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
 
 
     @Override
-    public void onDestroy()
-    {super.onDestroy();
+    public void onDestroy() {
+        super.onDestroy();
         doUnbindService();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
-
-
+    }
 }

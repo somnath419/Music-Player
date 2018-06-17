@@ -8,13 +8,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -35,9 +38,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.somnath.mymusic.adapters.TabPagerAdapter;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +61,12 @@ public class MainActivity extends AppCompatActivity
     private MyMusicService mBoundService;
     private Context context;
     private boolean mIsBound;
+    private View view;
+    private TextView name_song_main, album_song_main;
+    private ImageView album_img;
+    private ArrayList<Song> listplay;
+    private LinearLayout nav_header;
+    private int cur_song;
 
     //This is our viewPager
     private ViewPager viewPager;
@@ -71,45 +85,59 @@ public class MainActivity extends AppCompatActivity
     @TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         context = this;
-        startService(new Intent(MainActivity.this,MyMusicService.class));
-        doBindService();
+        view = (View) findViewById(R.id.viewnowPlaying);
+        name_song_main = (TextView) findViewById(R.id.name_song_main);
+        album_song_main = (TextView) findViewById(R.id.name_album_main);
+        album_img = (ImageView) findViewById(R.id.img_main_activiy);
+        nav_header = (LinearLayout) findViewById(R.id.nav_header);
 
+
+        listplay = new ArrayList<Song>();
+
+        startService(new Intent(MainActivity.this, MyMusicService.class));
+        doBindService();
 
         //Adding toolbar to the activity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //drawerlayout started
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        //Initializing the tablayout
-
-        View view = (View) findViewById(R.id.viewnowPlaying);
-
+        //Current playing on mainactivity
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, NowPlayingActivity.class);
-                if(mBoundService.getTracklist().size()>0)
-                {   if (mBoundService.getStatus() == 1)
+                if (mBoundService.getTracklist().size() > 0) {
+                    if (mBoundService.getStatus() == 1)
                         i.putExtra("from_main_playing", 2);
                     else
                         i.putExtra("from_main_not", 3);
-                }
-                else
-                    i.putExtra("empty_list",4);
+                } else
+                    i.putExtra("empty_list", 4);
 
 
                 startActivity(i);
             }
         });
 
+        /*nav_header click
+
+        nav_header.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawer.closeDrawer(GravityCompat.START);
+
+            }
+        }); */
+
+        //Initializing the tablayout
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
@@ -121,7 +149,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //service started
-
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -180,6 +207,42 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
+        DbNowplaying dbOpen = new DbNowplaying(context);
+        SQLiteDatabase db = dbOpen.getReadableDatabase();
+        Cursor c2 = db.query(DbNowplaying.TABLE_NAME, null, null, null, null, null, null);
+        listplay.clear();
+
+        while (c2.moveToNext()) {
+            listplay.add(new Song(c2.getLong(0), c2.getString(1), c2.getString(2), c2.getString(3), c2.getString(4), c2.getString(5)));
+        }
+
+
+        c2.close();
+
+
+        if (mBoundService != null)
+            Toast.makeText(context, String.valueOf(mBoundService.getTracklist().size()), Toast.LENGTH_SHORT).show();
+
+        Cursor cursor2 = db.query(DbNowplaying.TABLE2, null, null, null, null, null, null);
+
+        while (cursor2.moveToNext()) {
+            cur_song = cursor2.getInt(1);
+        }
+
+
+        cursor2.close();
+
+
+        if (listplay.size() > 0) {
+            name_song_main.setText(listplay.get(cur_song).getTitle());
+            album_song_main.setText(listplay.get(cur_song).getArtist());
+
+            String image =listplay.get(cur_song).getImg_Id();
+            Bitmap bm = BitmapFactory.decodeFile(image);
+            album_img.setImageBitmap(bm);
+        }
+
+        dbOpen.close();
 
     }
 
@@ -187,9 +250,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();
-        doUnbindService();
-
-
     }
 
 
@@ -222,14 +282,13 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_nowplaying) {
             Intent i = new Intent(MainActivity.this, NowPlayingActivity.class);
 
-            if(mBoundService.getTracklist().size()>0){
-                  if (mBoundService.getStatus() == 1)
-                      i.putExtra("from_main_playing", 2);
-                  else
-                     i.putExtra("from_main_not", 3);
-            }
-            else
-                     i.putExtra("empty_list",4);
+            if (mBoundService.getTracklist().size() > 0) {
+                if (mBoundService.getStatus() == 1)
+                    i.putExtra("from_main_playing", 2);
+                else
+                    i.putExtra("from_main_not", 3);
+            } else
+                i.putExtra("empty_list", 4);
             startActivity(i);
 
             return true;
@@ -276,8 +335,6 @@ public class MainActivity extends AppCompatActivity
     public void onDestroy() {
         super.onDestroy();
         //service stopped
-
-
     }
 
 

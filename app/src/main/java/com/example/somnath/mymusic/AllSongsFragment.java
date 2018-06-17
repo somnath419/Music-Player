@@ -231,6 +231,7 @@ public class AllSongsFragment extends Fragment {
                     long id = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
                     String tiitle = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
                     long id_album = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
+                    String album=cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
                     String artists = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
                     int getAdded=cursorAudio.getInt(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED));
                     String duration=cursorAudio.getString(cursorAudio.getColumnIndex(MediaStore.Audio.Media.DURATION));
@@ -242,7 +243,7 @@ public class AllSongsFragment extends Fragment {
                     if (cursor.moveToFirst()) {
                         String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
                         // do whatever you need to do
-                        songList.add(new Song(id, tiitle, artists, path,getAdded,duration));
+                        songList.add(new Song(id, tiitle,artists,path,getAdded,duration,album));
                     }
                 }
                 while (cursorAudio.moveToNext());

@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MyMusic.iml" filepath="$PROJECT_DIR$/MyMusic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Music-Player.iml" filepath="$PROJECT_DIR$/Music-Player.iml" />
+      <module fileurl="file://D:\Programs\Android\Music-Player\MyMusic.iml" filepath="D:\Programs\Android\Music-Player\MyMusic.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
