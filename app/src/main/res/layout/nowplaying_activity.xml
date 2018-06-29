@@ -24,7 +24,7 @@
     <ImageView
         android:id="@+id/song_icon"
         android:layout_width="fill_parent"
-        android:layout_height="400sp" />
+        android:layout_height="300sp" />
 
 
     <TextView
@@ -51,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="5:20" />
+        android:text="@string/_5_20" />
 
 
     <SeekBar
@@ -63,7 +63,7 @@
     <LinearLayout
         android:layout_width="200sp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|bottom">
+        android:layout_gravity="center_horizontal">
 
         <ImageButton
             android:id="@+id/previous"

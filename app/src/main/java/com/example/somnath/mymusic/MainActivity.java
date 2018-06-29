@@ -43,6 +43,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.somnath.mymusic.adapters.MyAdapter;
 import com.example.somnath.mymusic.adapters.TabPagerAdapter;
 
 import org.w3c.dom.Text;
@@ -162,7 +163,7 @@ public class MainActivity extends AppCompatActivity
         adapter.addFrag(new AlbumsFragment(), "ALBUMS");
         adapter.addFrag(new ArtistsFragment(), "ARTISTS");
         adapter.addFrag(new GenresFragment(), "GENRES");
-        adapter.addFrag(new AllSongsFragment(), "PLAYLISTS");
+        adapter.addFrag(new CustomList(), "PLAYLISTS");
 
         viewPager.setAdapter(adapter);
     }
@@ -215,14 +216,7 @@ public class MainActivity extends AppCompatActivity
         while (c2.moveToNext()) {
             listplay.add(new Song(c2.getLong(0), c2.getString(1), c2.getString(2), c2.getString(3), c2.getString(4), c2.getString(5)));
         }
-
-
         c2.close();
-
-
-        if (mBoundService != null)
-            Toast.makeText(context, String.valueOf(mBoundService.getTracklist().size()), Toast.LENGTH_SHORT).show();
-
         Cursor cursor2 = db.query(DbNowplaying.TABLE2, null, null, null, null, null, null);
 
         while (cursor2.moveToNext()) {
@@ -266,10 +260,27 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_main_drawer, menu);
+        getMenuInflater().inflate(R.menu.top_right_corner, menu);
 
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.exit:
+                 if(mBoundService!=null) {
+                       mBoundService.stop();
+                       doUnbindService();
+                       stopService(new Intent(context, MyMusicService.class));
+                    finishAffinity();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
 
     @SuppressWarnings("StatementWithEmptyBody")

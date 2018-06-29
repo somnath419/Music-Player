@@ -1,5 +1,6 @@
 package com.example.somnath.mymusic;
 
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +37,9 @@ public class AllSongsFragment extends Fragment {
     private MyMusicService mBoundService;
     private Context context;
     private boolean mIsBound,flag_cancel;
-    private ProgressBar progressBar;
+    private ProgressDialog pDialog;
+
+
 
     //mconnection
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -52,6 +55,10 @@ public class AllSongsFragment extends Fragment {
     public void onCreate(Bundle s) {
         super.onCreate(s);
         context = getContext();
+        pDialog = new ProgressDialog(context);
+        pDialog.setMessage("Please wait...");
+        pDialog.setCancelable(false);
+
         doBindService();
     }
 
@@ -59,7 +66,6 @@ public class AllSongsFragment extends Fragment {
     public View onCreateView ( LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState ) {
         View v = inflater.inflate(R.layout.allsong_mainview, container, false);
 
-        progressBar=(ProgressBar) v.findViewById(R.id.progressbar);
         list = (ListView) v.findViewById(R.id.list_item);
         songList = new ArrayList<Song>();
 
@@ -181,8 +187,7 @@ public class AllSongsFragment extends Fragment {
         }
 
         protected void onPreExecute() {
-
-            progressBar.setVisibility(View.VISIBLE);
+         showpDialog();
 
         }
 
@@ -198,6 +203,8 @@ public class AllSongsFragment extends Fragment {
         @Override
         protected void onCancelled() {
             super.onCancelled();
+
+            Toast.makeText(context, "cancel", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -207,10 +214,11 @@ public class AllSongsFragment extends Fragment {
             if(songList!= null) {
                 getTopRecentAdded(songList);
 
-                progressBar.setVisibility(View.GONE);
-
                 SongAdapter songAdt = new SongAdapter(getContext(), songList);
                 list.setAdapter(songAdt);
+
+                hidepDialog();
+
 
             }
         }
@@ -223,10 +231,7 @@ public class AllSongsFragment extends Fragment {
 
             if (cursorAudio != null && cursorAudio.moveToFirst()) {
                 do {
-                      if(isCancelled())
-                      {   cancel(true);
-                         break;
-                      }
+
 
                     long id = cursorAudio.getLong(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
                     String tiitle = cursorAudio.getString(cursorAudio.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
@@ -262,6 +267,17 @@ public class AllSongsFragment extends Fragment {
       }
 
 
+    }
+
+
+    private void showpDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    private void hidepDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
     }
 
 

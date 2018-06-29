@@ -64,9 +64,7 @@ public class GenresFragment extends Fragment {
 
 
         list = (ListView) v.findViewById(R.id.list_item);
-        progressBar = (ProgressBar) v.findViewById(R.id.progressbar);
         songList = new ArrayList<Song>();
-        progressBar.setVisibility(View.VISIBLE);
 
 
         new List_All_Genres(context).execute();
@@ -202,7 +200,6 @@ public class GenresFragment extends Fragment {
 
                 SongAdapter songAdt = new SongAdapter(getContext(), songList);
                 list.setAdapter(songAdt);
-                progressBar.setVisibility(View.GONE);
 
             }
         }

@@ -34,8 +34,8 @@
     <string name="play_pause">Play/Pause</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>
-
-
+    <string name="_5_20">5:20</string>
+    <string name="create_playlist">Create Playlist</string>
 
 
     <string-array name="Planets">

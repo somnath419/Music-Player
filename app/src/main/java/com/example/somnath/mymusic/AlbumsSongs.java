@@ -84,7 +84,6 @@ public class AlbumsSongs extends AppCompatActivity {
         listView=(ListView) findViewById(R.id.list_item);
 
         album_songs_list = new ArrayList<Song>();
-        progressBar=(ProgressBar) findViewById(R.id.progressbar);
 
         albumId=getIntent().getLongExtra("Id",0);
         album_image=getIntent().getStringExtra("album_art");
@@ -105,7 +104,6 @@ public class AlbumsSongs extends AppCompatActivity {
 
         protected void onPreExecute() {
 
-            progressBar.setVisibility(View.VISIBLE);
 
         }
 
@@ -133,7 +131,6 @@ public class AlbumsSongs extends AppCompatActivity {
                 AlbumSongsAdapter songAdt = new AlbumSongsAdapter(context, album_songs_list);
                 listView.setAdapter(songAdt);
 
-                progressBar.setVisibility(View.GONE);
             }
         }
 

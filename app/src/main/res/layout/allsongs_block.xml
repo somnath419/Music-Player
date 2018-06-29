@@ -22,6 +22,11 @@
          android:layout_toEndOf="@id/spaceall_list"
          android:layout_toRightOf="@+id/spaceall_list"
          />
+    <View android:layout_height="20sp"
+        android:layout_width="2sp"
+        android:layout_toEndOf="@+id/albums_text"/>
+
+
 
      <TextView
          android:id="@+id/artist_albums"

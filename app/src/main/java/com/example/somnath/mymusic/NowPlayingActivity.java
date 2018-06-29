@@ -184,6 +184,16 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
             if((currentstatus)&&(mBoundService.getCurrentTrackPosition()!= mBoundService.getTracklist().size()-1))
             { updateUI();
             }
+
+            if(mBoundService.getStatus()==1)
+            { play.setVisibility(View.GONE);
+                pause.setVisibility(View.VISIBLE);
+
+            }
+            else
+            {   play.setVisibility(View.VISIBLE);
+                pause.setVisibility(View.GONE);
+            }
             // Running this thread after 100 milliseconds
             mHandler.postDelayed(this, 100);
         }
@@ -233,34 +243,19 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         while (c2.moveToNext()) {
             dbsonglist.add(new Song(c2.getLong(0), c2.getString(1), c2.getString(2), c2.getString(3), c2.getString(4), c2.getString(5)));
         }
-
-
         c2.close();
-
-
-        if (mBoundService != null)
-            Toast.makeText(context, String.valueOf(mBoundService.getTracklist().size()), Toast.LENGTH_SHORT).show();
-
         Cursor cursor2 = db.query(DbNowplaying.TABLE2, null, null, null, null, null, null);
-
         while (cursor2.moveToNext()) {
             cur_song = cursor2.getInt(1);
         }
-
-
         cursor2.close();
-
         if(dbsonglist.size()>0) {
-
-
-
             String name = dbsonglist.get(cur_song).getTitle();
             name_song.setText(name);
 
             String image = dbsonglist.get(cur_song).getImg_Id();
             Bitmap bm = BitmapFactory.decodeFile(image);
             album_icon.setImageBitmap(bm);
-            name_song.setText(name);
         }
 
 
@@ -272,7 +267,6 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
         if (mBoundService != null) {
 
             if (mBoundService.getTracklist().size() > 0) {
-
 
                 if (mBoundService.getStatus() == 1) {
                     play.setVisibility(View.GONE);
@@ -383,7 +377,10 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
             public void onClick(View v) {
 
                 if (mBoundService != null && mBoundService.getTracklist().size() > 0) {
-                    mBoundService.play();
+                    if(mBoundService.getStatus()==0)
+                        mBoundService.play();
+                    else
+                    mBoundService.playTrack(cur_song);
                     updateUI();
                     pause.setVisibility(View.VISIBLE);
                     play.setVisibility(View.GONE);
@@ -443,6 +440,7 @@ public class NowPlayingActivity extends Activity implements SeekBar.OnSeekBarCha
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        finish();
 
     }
 }
