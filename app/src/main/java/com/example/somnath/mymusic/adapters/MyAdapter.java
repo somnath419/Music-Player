@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,10 +60,11 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private class ViewHolder2 extends RecyclerView.ViewHolder {
 
         private TextView mTextView_Artist,mTextView2;
+        private LinearLayout artist_linear_layout;
         private ViewHolder2(View v){
             super(v);
             mTextView_Artist=(TextView)v.findViewById(R.id.name_artist);
-
+            artist_linear_layout=(LinearLayout) v.findViewById(R.id.artist_linear);
         }
     }
 
@@ -134,8 +136,21 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 case 2:
                     ViewHolder2 viewHolder2 = (ViewHolder2) holder;
-                    Song currSong2 = listSong.get(position);
+                    final Song currSong2 = listSong.get(position);
                     viewHolder2.mTextView_Artist.setText(currSong2.getArtist());
+
+                    viewHolder2.artist_linear_layout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent intent=new Intent(mContext, AlbumsSongs.class);
+                            intent.putExtra("Id",currSong2.getAlbum_ID());
+                            intent.putExtra("album_art",currSong2.getAlbumart());
+                            mContext.startActivity(intent);
+
+                        }
+                    });
+
                     break;
             }
         }

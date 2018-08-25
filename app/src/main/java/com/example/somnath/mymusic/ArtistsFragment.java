@@ -118,8 +118,7 @@ public class ArtistsFragment extends Fragment{
                 ContentResolver musicResolver = getActivity().getContentResolver();
 
                 Uri smusicUri = android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-                Cursor musicCursor =musicResolver.query(smusicUri,null         //should use where clause(_ID==albumid)
-                        ,null, null, null);
+                Cursor musicCursor =musicResolver.query(smusicUri,null,null, null, null);
 
                 if (musicCursor != null && musicCursor.moveToFirst()) {
                     //get columns
