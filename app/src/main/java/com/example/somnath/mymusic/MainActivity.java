@@ -1,20 +1,14 @@
 package com.example.somnath.mymusic;
 
-import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.AppBarLayout;
@@ -161,8 +155,8 @@ public class MainActivity extends AppCompatActivity
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new AllSongsFragment(), "SONGS");
         adapter.addFrag(new AlbumsFragment(), "ALBUMS");
-        adapter.addFrag(new ArtistsFragment(), "ARTISTS");
-        adapter.addFrag(new GenresFragment(), "GENRES");
+       // adapter.addFrag(new ArtistsFragment(), "ARTISTS");
+      //  adapter.addFrag(new GenresFragment(), "GENRES");
         adapter.addFrag(new CustomList(), "PLAYLISTS");
 
         viewPager.setAdapter(adapter);
@@ -228,12 +222,12 @@ public class MainActivity extends AppCompatActivity
 
 
         if (listplay.size() > 0) {
-            name_song_main.setText(listplay.get(cur_song).getTitle());
-            album_song_main.setText(listplay.get(cur_song).getArtist());
+            //name_song_main.setText(listplay.get(cur_song).getTitle());
+            //album_song_main.setText(listplay.get(cur_song).getArtist());
 
             String image =listplay.get(cur_song).getImg_Id();
             Bitmap bm = BitmapFactory.decodeFile(image);
-            album_img.setImageBitmap(bm);
+           // album_img.setImageBitmap(bm);
         }
 
         dbOpen.close();
@@ -300,27 +294,15 @@ public class MainActivity extends AppCompatActivity
                     i.putExtra("from_main_not", 3);
             } else
                 i.putExtra("empty_list", 4);
-            startActivity(i);
+           // startActivity(i);
 
             return true;
 
 
-        } else if (id == R.id.nav_scanmedia) {
-
-            Intent i = new Intent(this, ScanActivity.class);
-            startActivity(i);
-            return true;
-
-        } else if (id == R.id.nav_manage) {
+        } else  if (id == R.id.nav_manage) {
             Intent i = new Intent(this, SettingActivity.class);
             startActivity(i);
             return true;
-
-        } else if (id == R.id.equalizer) {
-            Intent i = new Intent(this, EqualizerActivity.class);
-            startActivity(i);
-            return true;
-
 
         } else if (id == R.id.nav_share) {
 

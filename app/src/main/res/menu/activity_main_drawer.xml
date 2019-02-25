@@ -11,17 +11,9 @@
             android:icon="@drawable/ic_library_music_black_24dp"/>
 
         <item
-            android:id="@+id/nav_scanmedia"
-            android:title="@string/scan_media"
-            android:icon="@drawable/ic_loop_black_24dp"/>
-        <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/settings" />
-        <item
-            android:id="@+id/equalizer"
-            android:icon="@drawable/ic_equalizer_black_24dp"
-            android:title="@string/equalizer" />
 
         <item
             android:id="@+id/nav_share"

@@ -35,20 +35,7 @@ public class SettingActivity extends  AppCompatActivity {
           @Override
           public void onItemClick(AdapterView<?> parent, View view, int position, long id)
           {
-              if (position == 0) {
-                  Intent myIntent = new Intent(view.getContext(), ScanActivity.class);
-                  startActivityForResult(myIntent, 0);
-              }
 
-              if (position == 1) {
-                  Intent myIntent = new Intent(view.getContext(), ScanActivity.class);
-                  startActivityForResult(myIntent, 0);
-              }
-
-              if (position == 1) {
-              Intent myIntent = new Intent(view.getContext(), ScanActivity.class);
-              startActivityForResult(myIntent, 0);
-          }
           }
       });
 

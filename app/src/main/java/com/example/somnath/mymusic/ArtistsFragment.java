@@ -131,8 +131,9 @@ public class ArtistsFragment extends Fragment{
                         String this_albums=musicCursor.getString(titleAlbums);
                         String this_albumart=musicCursor.getString(AlbumArt);
                         String this_artists=musicCursor.getString(titleArtist);
+                        String albumimage=musicCursor.getString(AlbumArt);
 
-                        songList.add(new Song(this_artists,this_albums));
+                        songList.add(new Song(this_albums,this_artists,albumimage));
                     }
                     while (musicCursor.moveToNext());
                 }

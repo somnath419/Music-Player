@@ -38,10 +38,8 @@ public class Song {
         genre_s=genre;
     }
 
-    public  Song (String artist,String albums) {
-        a_lbums=albums;
-        Artist = artist;
-    }
+
+    //artist fragment
     public Song(String namealbum,String artists,String albumimage) {
         a_lbums=namealbum;
         albumart=albumimage;

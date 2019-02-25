@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.somnath.mymusic.AlbumsSongs;
+import com.example.somnath.mymusic.ArtistSongs;
 import com.example.somnath.mymusic.R;
 import com.example.somnath.mymusic.Song;
 import java.util.ArrayList;
@@ -126,6 +127,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             Intent intent=new Intent(mContext, AlbumsSongs.class);
                             intent.putExtra("Id",currSong.getAlbum_ID());
                             intent.putExtra("album_art",currSong.getAlbumart());
+                            intent.putExtra("album_name",currSong.getAlbums());
                             mContext.startActivity(intent);
 
 
@@ -137,14 +139,15 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 case 2:
                     ViewHolder2 viewHolder2 = (ViewHolder2) holder;
                     final Song currSong2 = listSong.get(position);
+
                     viewHolder2.mTextView_Artist.setText(currSong2.getArtist());
 
                     viewHolder2.artist_linear_layout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
 
-                            Intent intent=new Intent(mContext, AlbumsSongs.class);
-                            intent.putExtra("Id",currSong2.getAlbum_ID());
+                            Intent intent=new Intent(mContext, ArtistSongs.class);
+                            intent.putExtra("Id",currSong2.getArtist());
                             intent.putExtra("album_art",currSong2.getAlbumart());
                             mContext.startActivity(intent);
 

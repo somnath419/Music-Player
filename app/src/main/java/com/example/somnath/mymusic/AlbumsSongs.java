@@ -85,10 +85,15 @@ public class AlbumsSongs extends AppCompatActivity {
 
         album_songs_list = new ArrayList<Song>();
 
+        String album_name=getIntent().getStringExtra("album_name");
+        getSupportActionBar().setTitle(album_name);
         albumId=getIntent().getLongExtra("Id",0);
         album_image=getIntent().getStringExtra("album_art");
 
+
         new List_All_Songs(context).execute();
+
+
 
 
     }

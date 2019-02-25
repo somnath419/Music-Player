@@ -36,25 +36,10 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".NowPlayingActivity"
-
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
 
 
 
-        <activity
-            android:name=".ScanActivity"
-            android:label="Scan Media"
-            android:parentActivityName=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+
 
         <activity
             android:name=".SettingActivity"
@@ -64,16 +49,6 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".EqualizerActivity"
-            android:label="Equalizer"
-            android:parentActivityName=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-
 
 
         <activity

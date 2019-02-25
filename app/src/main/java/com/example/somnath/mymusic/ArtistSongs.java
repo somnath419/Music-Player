@@ -39,7 +39,7 @@ public class ArtistSongs extends AppCompatActivity {
         private ArrayList<Song> album_songs_list;
         private ProgressBar progressBar;
         private ListView listView;
-        private long artistID;
+        private String artistname;
         private MyMusicService mBoundService;
         private boolean mIsBound;
         private String album_image;
@@ -81,7 +81,7 @@ public class ArtistSongs extends AppCompatActivity {
 
             album_songs_list = new ArrayList<Song>();
 
-            artistID=getIntent().getLongExtra("Id",0);
+            artistname=getIntent().getStringExtra("Id");
             album_image=getIntent().getStringExtra("album_art");
 
             new List_All_Songs(context).execute();
@@ -105,7 +105,7 @@ public class ArtistSongs extends AppCompatActivity {
             }
 
             protected ArrayList<Song> doInBackground(Void... params) {
-                getalbum_songs_list();
+                getartists_songs_list();
 
                 return album_songs_list;
             }
@@ -132,7 +132,7 @@ public class ArtistSongs extends AppCompatActivity {
             }
 
 
-            private void getalbum_songs_list(){
+            private void getartists_songs_list(){
 
                 ContentResolver contentResolver = getContentResolver();
                 Uri mediaUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -164,7 +164,7 @@ public class ArtistSongs extends AppCompatActivity {
 
 
                         // Add the info to our array.
-                        if(artistID == artistId)
+                        if(artistname.equals(thisArtist))
                         {
                             album_songs_list.add(new Song(thisId, thisTitle, thisArtist,album_image,getAdded));
                         }
