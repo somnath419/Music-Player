@@ -13,7 +13,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="@color/colordont"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
@@ -33,7 +33,7 @@
             android:layout_toEndOf="@+id/img_main_activiy"
             android:layout_width="wrap_content"
             android:textSize="20sp"
-            android:textColor="@color/colordont"
+            android:textColor="@color/colorblack"
             android:text="Song's Name"
             android:maxLines="1"
             android:layout_height="25sp"/>
@@ -43,15 +43,10 @@
             android:layout_below="@id/name_song_main"
             android:layout_width="wrap_content"
             android:textSize="20sp"
-            android:textColor="@color/colordont"
+            android:textColor="@color/colorblack"
             android:maxLines="1"
             android:text="Albums Name"
             android:layout_height="25sp"/>
-
-
-
-
-
 
     </RelativeLayout>
 
@@ -62,7 +57,7 @@
         android:layout_below="@id/viewnowPlaying"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="@color/colordont"
         android:minHeight="?attr/actionBarSize"
         android:scrollbars="horizontal"
         app:tabGravity="fill"

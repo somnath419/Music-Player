@@ -204,7 +204,6 @@ public class AllSongsFragment extends Fragment {
         protected void onCancelled() {
             super.onCancelled();
 
-            Toast.makeText(context, "cancel", Toast.LENGTH_SHORT).show();
         }
 
 

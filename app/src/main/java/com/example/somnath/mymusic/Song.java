@@ -16,6 +16,8 @@ public class Song {
     private String img_Id;
     private int date_added;
     private long album_ID;
+    private String videodata;
+    private String videoname;
 
 
     public Song(long id, String songTitle,String artist,String img,String genres,String albums) {
@@ -27,6 +29,14 @@ public class Song {
         img_Id=img;
 
     }
+
+    public Song (String data ,String name)
+    {
+        videodata=data;
+        videoname=name;
+    }
+
+
 
     public  Song (long id ,String titl)
     {
@@ -106,6 +116,8 @@ public class Song {
     public String getImg_Id(){return img_Id;}
     public int getDate_added(){return date_added;}
     public long getAlbum_ID(){ return album_ID;}
+    public String getVideodata(){return videodata;}
+    public String getVideoname(){return videoname;}
 
 
 

@@ -140,7 +140,6 @@ public class MyMusicService extends Service {
         };
         registerReceiver(receiver, filter);
 
-        Toast.makeText(context, "onBind", Toast.LENGTH_SHORT).show();
 
         return playerBinder;
     }

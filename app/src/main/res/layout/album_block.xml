@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -20,7 +20,7 @@
         <TextView
             android:id="@+id/albumname"
             android:maxLines="1"
-            android:textColor="@color/colorwhite"
+            android:textColor="@color/colordont"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
             android:id="@+id/artistname"
             android:maxLines="1"
             android:layout_below="@+id/albumname"
-            android:textColor="@color/colorwhite"
+            android:textColor="@color/colordont"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             >

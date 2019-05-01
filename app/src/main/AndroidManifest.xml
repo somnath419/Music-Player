@@ -30,21 +30,8 @@
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-
-
-
-
-
-
-        <activity
-            android:name=".SettingActivity"
-            android:label="Settings"
-            android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -55,6 +42,7 @@
             android:name=".AlbumsSongs"
             android:label="Album Songs"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity">
 
             <intent-filter>
@@ -64,38 +52,27 @@
 
 
 
-        <activity
-            android:name=".GenreSongs"
-            android:label="Genre Songs"
-            android:launchMode="singleTop"
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-
-
 
         <activity
             android:name=".ArtistSongs"
             android:label="Artist Songs"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".PlayingListActivity"
-            android:label="Playing List"
-            android:launchMode="singleTop"
-            android:parentActivityName=".NowPlayingActivity"
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+
+        <activity android:name=".NowPlayingActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".PlayingListActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Videoplayer"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+          />
 
         <service
             android:name=".MyMusicService"

@@ -11,15 +11,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -29,18 +25,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.somnath.mymusic.adapters.MyAdapter;
-import com.example.somnath.mymusic.adapters.TabPagerAdapter;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,9 +142,8 @@ public class MainActivity extends AppCompatActivity
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new AllSongsFragment(), "SONGS");
         adapter.addFrag(new AlbumsFragment(), "ALBUMS");
-       // adapter.addFrag(new ArtistsFragment(), "ARTISTS");
-      //  adapter.addFrag(new GenresFragment(), "GENRES");
-        adapter.addFrag(new CustomList(), "PLAYLISTS");
+        adapter.addFrag(new ArtistsFragment(), "ARTISTS");
+        adapter.addFrag(new VideosList(), "VIDEOS");
 
         viewPager.setAdapter(adapter);
     }
@@ -222,12 +208,12 @@ public class MainActivity extends AppCompatActivity
 
 
         if (listplay.size() > 0) {
-            //name_song_main.setText(listplay.get(cur_song).getTitle());
-            //album_song_main.setText(listplay.get(cur_song).getArtist());
+            name_song_main.setText(listplay.get(cur_song).getTitle());
+            album_song_main.setText(listplay.get(cur_song).getArtist());
 
-            String image =listplay.get(cur_song).getImg_Id();
+            String image = listplay.get(cur_song).getImg_Id();
             Bitmap bm = BitmapFactory.decodeFile(image);
-           // album_img.setImageBitmap(bm);
+            album_img.setImageBitmap(bm);
         }
 
         dbOpen.close();
@@ -263,10 +249,10 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.exit:
-                 if(mBoundService!=null) {
-                       mBoundService.stop();
-                       doUnbindService();
-                       stopService(new Intent(context, MyMusicService.class));
+                if (mBoundService != null) {
+                    mBoundService.stop();
+                    doUnbindService();
+                    stopService(new Intent(context, MyMusicService.class));
                     finishAffinity();
                 }
                 return true;
@@ -274,7 +260,6 @@ public class MainActivity extends AppCompatActivity
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -294,15 +279,10 @@ public class MainActivity extends AppCompatActivity
                     i.putExtra("from_main_not", 3);
             } else
                 i.putExtra("empty_list", 4);
-           // startActivity(i);
-
-            return true;
-
-
-        } else  if (id == R.id.nav_manage) {
-            Intent i = new Intent(this, SettingActivity.class);
             startActivity(i);
+
             return true;
+
 
         } else if (id == R.id.nav_share) {
 
@@ -310,11 +290,19 @@ public class MainActivity extends AppCompatActivity
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT, "It is here my app. Give it a try! " +
-                    " \n http://www.somgemyadav.tk");
+                    " \n https://drive.google.com/open?id=1PNXEjtVo6i-QaKPe_S0S9WBSG5nQx3wy");
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.sendto)));
             return true;
 
+        } else if (id == R.id.nav_exit) {
+            if (mBoundService != null) {
+                mBoundService.stop();
+                doUnbindService();
+                stopService(new Intent(context, MyMusicService.class));
+                finishAffinity();
+            }
+            return true;
 
         }
 
